@@ -1,0 +1,94 @@
+
+# 📝 Video to Article - Generador de artículos desde vídeos para medios Secreta
+
+Este proyecto permite a los editores de medios como **Valencia Secreta** y **Barcelona Secreta** generar artículos listos para publicar a partir de vídeos subidos. El sistema transcribe automáticamente el vídeo usando **Whisper**, y genera el artículo usando **ChatGPT** con estilos adaptados según el medio.
+
+---
+
+## 🚀 ¿Qué hace esta app?
+
+- ✅ Transcribe vídeos automáticamente (.mp4, .mov, .avi, etc.)
+- ✍️ Genera artículos listos para publicar (con títulos, negritas, estilo periodístico)
+- 📋 Permite añadir instrucciones editoriales personalizadas
+- 🔒 Protegida con contraseña para uso interno
+- 📄 Exporta a HTML, Markdown o permite copiar directamente
+
+---
+
+## 📦 Requisitos
+
+- Python 3.9 o superior
+- Cuenta en OpenAI con acceso a `whisper-1` y `gpt-4`
+- Streamlit y dependencias del proyecto
+
+---
+
+## 🛠 Instalación local
+
+1. Clona este repositorio:
+
+```bash
+git clone https://github.com/TU_USUARIO/video-to-article.git
+cd video-to-article
+```
+
+2. Crea un entorno virtual (opcional pero recomendado):
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+3. Instala las dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Crea un archivo `.env` con tus claves de API:
+
+```
+WHISPER_API_KEY=tu_clave_openai_para_whisper
+CHATGPT_API_KEY=tu_clave_openai_para_chatgpt
+```
+
+---
+
+## ▶️ Ejecutar la app
+
+```bash
+streamlit run app.py
+```
+
+🔐 Al iniciar, la app te pedirá una contraseña. Usa: `SECRETMEDIA`
+
+---
+
+## 🌐 Despliegue en Streamlit Cloud (opcional)
+
+1. Sube este repositorio a GitHub (como privado).
+2. Ve a [https://streamlit.io/cloud](https://streamlit.io/cloud) y crea una app nueva conectada al repo.
+3. En la configuración de **Secrets** o **Environment Variables**, añade:
+
+```
+WHISPER_API_KEY = tu_clave
+CHATGPT_API_KEY = tu_clave
+```
+
+4. Lanza la app. ¡Listo para usar!
+
+---
+
+## ✅ TODOs futuros
+
+- [ ] Añadir opción de seleccionar el autor del artículo
+- [ ] Integración con la API de WordPress
+- [ ] Mejorar la detección de idioma y permitir traducción cruzada
+
+---
+
+## 🧠 Autores y contacto
+
+Desarrollado para uso interno en el equipo de SMN.
+
+Para soporte técnico, contactar con Jakub Motyka (jakub.motyka@feverup.com).
