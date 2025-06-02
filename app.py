@@ -1,3 +1,4 @@
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -41,13 +42,17 @@ Tu tarea va a ser escribir artículos originales en base a unas transcripciones 
 st.set_page_config(page_title="Convertir vídeo en texto")
 st.title("📝 Conversor de vídeo a texto para SMN")
 
-# --- INTERFAZ PROGRESIVA ---
+# --- INTERFAZ PROGRESIVA POR ETAPAS ---
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
-    site = st.selectbox("¿Para qué site es este artículo?", list(PROMPTS.keys()))
+    st.session_state.video_uploaded = True
+else:
+    st.stop()
 
-    if site:
+if st.session_state.get("video_uploaded"):
+    site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *PROMPTS.keys()])
+    if site != "Selecciona...":
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
         if st.button("🎬 Generar artículo"):
