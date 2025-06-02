@@ -14,7 +14,7 @@ if not st.session_state.authenticated:
     pw = st.text_input("Introduce la contraseña para acceder", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.stop()
 
