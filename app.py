@@ -74,8 +74,8 @@ if video_file and site:
         full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
     st.info("Generando artículo con ChatGPT...")
-    openai.api_key = CHATGPT_API_KEY
-    chat_response = openai.ChatCompletion.create(
+    client = openai.OpenAI()
+    chat_response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
@@ -84,7 +84,7 @@ if video_file and site:
         temperature=0.7
     )
 
-    article = chat_response["choices"][0]["message"]["content"]
+    article = chat_response.choices[0].message.content
 
     st.success("✅ Artículo generado")
     st.subheader("🔎 Vista previa del artículo")
