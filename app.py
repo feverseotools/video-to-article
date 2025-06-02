@@ -64,7 +64,7 @@ if video_file and site:
             model="whisper-1",
             file=audio_file
         )
-    transcription = transcript_response["text"]
+    transcription = transcript_response.text
 
     st.success("✅ Transcripción completada")
     st.text_area("Texto transcrito:", transcription, height=200)
