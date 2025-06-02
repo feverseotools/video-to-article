@@ -59,7 +59,7 @@ if video_file and site:
     st.info("Transcribiendo vídeo con Whisper...")
     openai.api_key = WHISPER_API_KEY
     with open(tmp_path, "rb") as audio_file:
-        client = openai.OpenAI(api_key=WHISPER_API_KEY)
+        client = openai.OpenAI()
         transcript_response = client.audio.transcriptions.create(
             model="whisper-1",
             file=audio_file
