@@ -1,9 +1,11 @@
-import streamlit as st
+from dotenv import load_dotenv
+load_dotenv()
+
 from openai import OpenAI
+import streamlit as st
 import tempfile
 import os
 from pathlib import Path
-from typing import Literal
 
 # --- AUTENTICACIÓN SIMPLE ---
 PASSWORD = "SECRETMEDIA"
@@ -18,13 +20,7 @@ if not st.session_state.authenticated:
     else:
         st.stop()
 
-# --- CONFIGURA TUS CLAVES API AQUÍ ---
-
-from dotenv import load_dotenv
-load_dotenv()
-
-WHISPER_API_KEY = os.getenv("WHISPER_API_KEY")
-CHATGPT_API_KEY = os.getenv("CHATGPT_API_KEY")
+client = OpenAI()
 
 # --- ASOCIACIÓN DE PROMPTS POR SITE ---
 PROMPTS = {
@@ -42,57 +38,57 @@ Tu tarea va a ser escribir artículos originales en base a unas transcripciones 
 }
 
 # --- CONFIGURACIÓN INICIAL ---
-st.set_page_config(page_title="Convertir vídeo en artículo")
+st.set_page_config(page_title="Convertir vídeo en texto")
 st.title("📝 Conversor de vídeo a texto para SMN")
 
-# --- SUBIDA DE ARCHIVO ---
+# --- INTERFAZ PROGRESIVA ---
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
 
-site = st.selectbox("¿Para qué site es este artículo?", list(PROMPTS.keys()))
-extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
+if video_file:
+    site = st.selectbox("¿Para qué site es este artículo?", list(PROMPTS.keys()))
 
-if video_file and site:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
-        tmp.write(video_file.read())
-        tmp_path = tmp.name
+    if site:
+        extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
-    st.info("Transcribiendo vídeo con Whisper...")
-    with open(tmp_path, "rb") as audio_file:
-        client = OpenAI()
-        transcript_response = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio_file
-        )
-    transcription = transcript_response.text
+        if st.button("🎬 Generar artículo"):
+            with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
+                tmp.write(video_file.read())
+                tmp_path = tmp.name
 
-    st.success("✅ Transcripción completada")
-    st.text_area("Texto transcrito:", transcription, height=200)
+            with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
+                with open(tmp_path, "rb") as audio_file:
+                    transcript_response = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_file
+                    )
+                transcription = transcript_response.text
 
-    full_prompt = PROMPTS[site] + "\n\nTranscripción:\n" + transcription
-    if extra_prompt:
-        full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
+            st.success("✅ Transcripción completada")
+            st.text_area("Texto transcrito:", transcription, height=200)
 
-    st.info("Generando artículo con ChatGPT...")
-    client = OpenAI()
-    chat_response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
-            {"role": "user", "content": full_prompt}
-        ],
-        temperature=0.7
-    )
+            full_prompt = PROMPTS[site] + "\n\nTranscripción:\n" + transcription
+            if extra_prompt:
+                full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
-    article = chat_response.choices[0].message.content
+            with st.spinner("🧠 Generando artículo con ChatGPT..."):
+                chat_response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                        {"role": "user", "content": full_prompt}
+                    ],
+                    temperature=0.7
+                )
+                article = chat_response.choices[0].message.content
 
-    st.success("✅ Artículo generado")
-    st.subheader("🔎 Vista previa del artículo")
-    st.markdown(article, unsafe_allow_html=True)
+            st.success("✅ Artículo generado")
+            st.subheader("🔎 Vista previa del artículo")
+            st.markdown(article, unsafe_allow_html=True)
 
-    st.subheader("📋 Código Markdown")
-    st.code(article)
+            st.subheader("📋 Código Markdown")
+            st.code(article)
 
-    st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-    st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
+            st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
+            st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
 
-    os.remove(tmp_path)
+            os.remove(tmp_path)
