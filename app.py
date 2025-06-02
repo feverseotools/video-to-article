@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import tempfile
 import os
 from pathlib import Path
@@ -43,7 +43,7 @@ Tu tarea va a ser escribir artículos originales en base a unas transcripciones 
 
 # --- CONFIGURACIÓN INICIAL ---
 st.set_page_config(page_title="Convertir vídeo en artículo")
-st.title("📝 Conversor de vídeo a artículo para medios Secreta")
+st.title("📝 Conversor de vídeo a texto para SMN")
 
 # --- SUBIDA DE ARCHIVO ---
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
@@ -59,7 +59,7 @@ if video_file and site:
     st.info("Transcribiendo vídeo con Whisper...")
     openai.api_key = WHISPER_API_KEY
     with open(tmp_path, "rb") as audio_file:
-        client = openai.OpenAI()
+        client = OpenAI()
         transcript_response = client.audio.transcriptions.create(
             model="whisper-1",
             file=audio_file
@@ -74,7 +74,7 @@ if video_file and site:
         full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
     st.info("Generando artículo con ChatGPT...")
-    client = openai.OpenAI()
+    client = OpenAI()
     chat_response = client.chat.completions.create(
         model="gpt-4",
         messages=[
