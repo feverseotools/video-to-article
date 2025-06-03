@@ -55,7 +55,7 @@ if st.session_state.get("video_uploaded"):
     if site != "Selecciona...":
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
-        if st.button("🎬 Generar artículo"):
+        if st.button("🪄 Generar artículo"):
             with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
                 tmp.write(video_file.read())
                 tmp_path = tmp.name

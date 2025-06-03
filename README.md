@@ -15,7 +15,24 @@ Este proyecto permite a los editores de medios como **Valencia Secreta** y **Bar
 
 ---
 
-## 📦 Requisitos
+## 🔗 Nota sobre LucidLink
+
+LucidLink no permite acceder a archivos mediante enlaces públicos o sin autenticación por seguridad (modelo de cero conocimiento).  
+Por tanto, si quieres usar un vídeo que está almacenado en LucidLink:
+
+1. Asegúrate de tener instalado el cliente de escritorio de LucidLink.
+2. Inicia sesión y monta tu Filespace como si fuera una unidad en tu equipo.
+3. Sube el archivo desde esa ruta usando la opción de subida directa.
+
+---
+
+## ▶️ Contraseña
+
+🔐 Al iniciar, la app te pedirá una contraseña. Usa: `SECRETMEDIA`
+
+---
+
+## 📦 Requisitos (solo para desarrolladores)
 
 - Python 3.9 o superior
 - Cuenta en OpenAI con acceso a `whisper-1` y `gpt-4`
@@ -23,7 +40,7 @@ Este proyecto permite a los editores de medios como **Valencia Secreta** y **Bar
 
 ---
 
-## 🛠 Instalación local
+## 🛠 Instalación local (solo para desarrolladores)
 
 1. Clona este repositorio:
 
@@ -54,7 +71,7 @@ CHATGPT_API_KEY=tu_clave_openai_para_chatgpt
 
 ---
 
-## ▶️ Ejecutar la app
+## ▶️ Ejecutar la app (solo para desarrolladores)
 
 ```bash
 streamlit run app.py
@@ -64,7 +81,7 @@ streamlit run app.py
 
 ---
 
-## 🌐 Despliegue en Streamlit Cloud (opcional)
+## 🌐 Despliegue en Streamlit Cloud (opcional, solo para desarrolladores)
 
 1. Sube este repositorio a GitHub (como privado).
 2. Ve a [https://streamlit.io/cloud](https://streamlit.io/cloud) y crea una app nueva conectada al repo.
