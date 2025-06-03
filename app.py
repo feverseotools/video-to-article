@@ -63,7 +63,9 @@ Además, sigue estas instrucciones:
 
 - Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
 
-- Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia."""
+- Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia.
+
+El artículo debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR. Se recomienda seguir estructuras de titulares probadas que combinan gancho narrativo, contexto local y elementos diferenciales del contenido. En el cuerpo del artículo, es esencial mantener la coherencia con el titular (evitando el clickbait), incluir H2 que desarrollen preguntas o subtemas relevantes con entidades fuertes, y enriquecer el texto con referencias específicas a lugares, personas o situaciones concretas. También debe integrarse contenido visual de calidad, como imágenes descriptivas o montajes relevantes al inicio, y vídeos contextuales a lo largo del texto. La redacción debe ser clara, directa, cercana al lenguaje hablado y aportar valor informativo inmediato, alineándose con el enfoque visual, emocional y temáticamente segmentado que caracteriza a Discover."""
 }
 
 # --- CONFIGURACIÓN INICIAL ---
