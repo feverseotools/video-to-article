@@ -1,5 +1,5 @@
 
-# 📝 Video to Article - Generador de artículos desde vídeos para medios Secreta
+# 📝 Video to Article - Generador de artículos desde vídeos para SMN
 
 Este proyecto permite a los editores de medios como **Valencia Secreta** y **Barcelona Secreta** generar artículos listos para publicar a partir de vídeos subidos. El sistema transcribe automáticamente el vídeo usando **Whisper**, y genera el artículo usando **ChatGPT** con estilos adaptados según el medio.
 
