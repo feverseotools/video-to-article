@@ -230,10 +230,6 @@ if video_file:
 
     if site != "Selecciona...":
         editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
-
-        if editor:
-            extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
-        editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
         if editor:
             extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
