@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 15:53h)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 15:58h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -102,21 +102,20 @@ if video_file:
                 st.markdown(article, unsafe_allow_html=True)
 
                 st.subheader("📰 Posibles titulares para Google Discover")
-                discover_prompt = (
-                    "A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
-                    "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
-                    "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
-                    "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
-                    "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
-                    "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
-                )
-                discover_response = client.chat.completions.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "user", "content": discover_prompt}
-                    ]
-                )
-                st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+                with st.spinner("✨ Generando titulares optimizados para Discover..."):
+                    discover_prompt = (
+                        "A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                        "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
+                        "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
+                        "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
+                        "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
+                        "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+                    )
+                    discover_response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[{"role": "user", "content": discover_prompt}]
+                    )
+                    st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
 
                 st.subheader("💻 Código HTML")
                 st.code(article, language='html')
@@ -125,7 +124,7 @@ if video_file:
                 st.code(article)
 
                 st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-                st.text_input("Presiona Ctrl+C para copiar el artículo desde Markdown", value=article)
+                st.text_input("Presiona Ctrl+C para copiar el artículo desde aquí", value=article)
 
             except Exception as e:
                 st.error(f"❌ Error al procesar el archivo: {str(e)}")
