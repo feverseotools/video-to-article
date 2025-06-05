@@ -224,7 +224,15 @@ if video_file:
         mime_type = "video/mp4"
 
     site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *PROMPTS.keys()])
+
+    editor = ""
+    extra_prompt = ""
+
     if site != "Selecciona...":
+        editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
+
+        if editor:
+            extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
         editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
         if editor:
             extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
