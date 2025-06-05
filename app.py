@@ -23,7 +23,11 @@ if not st.session_state.authenticated:
 
 client = OpenAI()
 
-# --- ASOCIACIÓN DE PROMPTS POR SITE ---
+# --- CONFIGURACIÓN INICIAL ---
+st.set_page_config(page_title="Convertir vídeo en texto")
+st.title("📝 Conversor de vídeo a texto para SMN")
+
+# --- PROMPTS COMPLETOS (reincorporados) ---
 PROMPTS = {
     "Valencia Secreta": """Eres un redactor especializado en planes y cosas que hacer en Valencia, con muchos años de experiencia y has visitado todos los lugares de moda en la ciudad, se te da muy bien hacer recomendaciones de qué visitar y dar contexto sobre los sitios que recomiendas.
 
@@ -59,10 +63,7 @@ Además, sigue estas instrucciones:
 El artículo debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR. Se recomienda seguir estructuras de titulares probadas que combinan gancho narrativo, contexto local y elementos diferenciales del contenido. En el cuerpo del artículo, es esencial mantener la coherencia con el titular (evitando el clickbait), incluir H2 que desarrollen preguntas o subtemas relevantes con entidades fuertes, y enriquecer el texto con referencias específicas a lugares, personas o situaciones concretas. También debe integrarse contenido visual de calidad, como imágenes descriptivas o montajes relevantes al inicio, y vídeos contextuales a lo largo del texto. La redacción debe ser clara, directa, cercana al lenguaje hablado y aportar valor informativo inmediato, alineándose con el enfoque visual, emocional y temáticamente segmentado que caracteriza a Discover."""
 }
 
-# --- CONFIGURACIÓN INICIAL ---
-st.set_page_config(page_title="Convertir vídeo en texto")
-st.title("📝 Conversor de vídeo a texto para SMN")
-
+# --- FLUJO DE APLICACIÓN ---
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
@@ -70,45 +71,58 @@ if video_file:
         tmp.write(video_file.read())
         tmp_path = tmp.name
 
+    file_size = os.path.getsize(tmp_path)
+    st.info(f"Tamaño del archivo: {file_size} bytes")
+
+    if file_size == 0:
+        st.error("❌ El archivo está vacío. Por favor, sube un vídeo con audio.")
+        st.stop()
+
     site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *PROMPTS.keys()])
     if site != "Selecciona...":
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
         if st.button("🎬 Generar artículo"):
-            with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
-                with open(tmp_path, "rb") as audio_file:
-                    transcript_response = client.audio.transcriptions.create(
-                        model="whisper-1",
-                        file=audio_file
+            try:
+                with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
+                    with open(tmp_path, "rb") as audio_file:
+                        transcript_response = client.audio.transcriptions.create(
+                            model="whisper-1",
+                            file=audio_file,
+                            filename=Path(tmp_path).name,
+                            response_format="json"
+                        )
+                    transcription = transcript_response.text
+
+                st.success("✅ Transcripción completada")
+                st.text_area("Texto transcrito:", transcription, height=200)
+
+                full_prompt = PROMPTS[site] + "\n\nTranscripción:\n" + transcription
+                if extra_prompt:
+                    full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
+
+                with st.spinner("🧠 Generando artículo con ChatGPT..."):
+                    chat_response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                            {"role": "user", "content": full_prompt}
+                        ],
+                        temperature=0.7
                     )
-                transcription = transcript_response.text
+                    article = chat_response.choices[0].message.content
 
-            st.success("✅ Transcripción completada")
-            st.text_area("Texto transcrito:", transcription, height=200)
+                st.success("✅ Artículo generado")
+                st.subheader("🔎 Vista previa del artículo")
+                st.markdown(article, unsafe_allow_html=True)
 
-            full_prompt = PROMPTS[site] + "\n\nTranscripción:\n" + transcription
-            if extra_prompt:
-                full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
+                st.subheader("📋 Código Markdown")
+                st.code(article)
 
-            with st.spinner("🧠 Generando artículo con ChatGPT..."):
-                chat_response = client.chat.completions.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
-                        {"role": "user", "content": full_prompt}
-                    ],
-                    temperature=0.7
-                )
-                article = chat_response.choices[0].message.content
+                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
 
-            st.success("✅ Artículo generado")
-            st.subheader("🔎 Vista previa del artículo")
-            st.markdown(article, unsafe_allow_html=True)
-
-            st.subheader("📋 Código Markdown")
-            st.code(article)
-
-            st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-            st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
-
-            os.remove(tmp_path)
+            except Exception as e:
+                st.error(f"❌ Error al procesar el archivo: {str(e)}")
+            finally:
+                os.remove(tmp_path)
