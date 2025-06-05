@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 16:35h)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 16:40h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -34,11 +34,13 @@ def load_prompt(file_path):
 
 sites = {
     "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
-    "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt")
+    "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
+    "New York City": load_prompt("prompts/sites/nyc_secret.txt")
 }
 
 editors = {
-    "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt")
+    "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
+    "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
 }
 
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
