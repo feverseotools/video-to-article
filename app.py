@@ -224,6 +224,7 @@ if video_file:
         mime_type = "video/mp4"
 
     
+
 site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *PROMPTS.keys()])
 
 if site != "Selecciona...":
@@ -231,53 +232,61 @@ if site != "Selecciona...":
 
     if editor:
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
-")
 
-            if st.button("🎬 Generar artículo"):
-                try:
-                    with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
-                        with open(tmp_path, "rb") as audio_file:
-                            transcript_response = client.audio.transcriptions.create(
-                                model="whisper-1",
-                                file=audio_file,
-                                filename=Path(tmp_path).name,
-                                file_content_type=mime_type,
-                                response_format="json"
-                            )
-                        transcription = transcript_response.text
-
-                    st.success("✅ Transcripción completada")
-                    st.text_area("Texto transcrito:", transcription, height=200)
-
-                    full_prompt = PROMPTS[site]
-                    if editor:
-                        full_prompt += "\n\nContexto del editor:\n" + EDITORS[editor]
-                    full_prompt += "\n\nTranscripción:\n" + transcription
-                    if extra_prompt:
-                        full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
-
-                    with st.spinner("🧠 Generando artículo con ChatGPT..."):
-                        chat_response = client.chat.completions.create(
-                            model="gpt-4",
-                            messages=[
-                                {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
-                                {"role": "user", "content": full_prompt}
-                            ],
-                            temperature=0.7
+        if st.button("🎬 Generar artículo"):
+            try:
+                with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
+                    with open(tmp_path, "rb") as audio_file:
+                        transcript_response = client.audio.transcriptions.create(
+                            model="whisper-1",
+                            file=audio_file,
+                            filename=Path(tmp_path).name,
+                            file_content_type=mime_type,
+                            response_format="json"
                         )
-                        article = chat_response.choices[0].message.content
+                    transcription = transcript_response.text
 
-                    st.success("✅ Artículo generado")
-                    st.subheader("🔎 Vista previa del artículo")
-                    st.markdown(article, unsafe_allow_html=True)
+                st.success("✅ Transcripción completada")
+                st.text_area("Texto transcrito:", transcription, height=200)
 
-                    st.subheader("📋 Código Markdown")
-                    st.code(article)
+                full_prompt = PROMPTS[site]
+                full_prompt += "
 
-                    st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-                    st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
+Contexto del editor:
+" + EDITORS[editor]
+                full_prompt += "
 
-                except Exception as e:
-                    st.error(f"❌ Error al procesar el archivo: {str(e)}")
-                finally:
-                    os.remove(tmp_path)
+Transcripción:
+" + transcription
+                if extra_prompt:
+                    full_prompt += "
+
+Instrucciones adicionales del editor:
+" + extra_prompt
+
+                with st.spinner("🧠 Generando artículo con ChatGPT..."):
+                    chat_response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                            {"role": "user", "content": full_prompt}
+                        ],
+                        temperature=0.7
+                    )
+                    article = chat_response.choices[0].message.content
+
+                st.success("✅ Artículo generado")
+                st.subheader("🔎 Vista previa del artículo")
+                st.markdown(article, unsafe_allow_html=True)
+
+                st.subheader("📋 Código Markdown")
+                st.code(article)
+
+                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
+
+            except Exception as e:
+                st.error(f"❌ Error al procesar el archivo: {{str(e)}}")
+            finally:
+                os.remove(tmp_path)
+
