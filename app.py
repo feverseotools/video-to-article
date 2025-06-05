@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 16:54h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v05/06/2025 17:03h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -24,8 +24,8 @@ if not st.session_state.authenticated:
 client = OpenAI()
 
 # --- CONFIGURACIÓN INICIAL ---
-st.set_page_config(page_title="Convertir vídeo en texto")
-st.title("📝 Conversor de vídeo a texto para SMN")
+st.set_page_config(page_title="Convert Video into Text")
+st.title("📝 Video > Text AI Converter for SMN")
 
 # --- CARGA DE PROMPTS EXTERNOS ---
 def load_prompt(file_path):
@@ -43,7 +43,7 @@ editors = {
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
 }
 
-video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
+video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
@@ -51,25 +51,25 @@ if video_file:
         tmp_path = tmp.name
 
     file_size = os.path.getsize(tmp_path)
-    st.info(f"Tamaño del archivo: {file_size} bytes")
+    st.info(f"File size: {file_size} bytes")
 
     if file_size == 0:
-        st.error("❌ El archivo está vacío. Por favor, sube un vídeo con audio.")
+        st.error("❌ File is empty. Please, upload a video with audio.")
         st.stop()
 
     mime_type, _ = mimetypes.guess_type(tmp_path)
     if not mime_type:
         mime_type = "video/mp4"
 
-    editor = st.selectbox("¿Quién es el editor del contenido?", ["Ningun@", *editors.keys()])
-    site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *sites.keys()])
+    editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
+    site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 
-    if site != "Selecciona...":
-        extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
+    if site != "Select...":
+        extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
 
-        if st.button("✍️ Generar artículo"):
+        if st.button("✍️ Create article"):
             try:
-                with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
+                with st.spinner("⏳ Getting transcription of the video with Whisper..."):
                     with open(tmp_path, "rb") as audio_file:
                         transcript_response = client.audio.transcriptions.create(
                             model="whisper-1",
@@ -78,17 +78,17 @@ if video_file:
                         )
                     transcription = transcript_response.text
 
-                st.success("✅ Transcripción completada")
-                st.text_area("Texto transcrito:", transcription, height=200)
+                st.success("✅ Transcription completed")
+                st.text_area("Text of the video:", transcription, height=200)
 
                 full_prompt = sites[site]
-                if editor != "Ningun@":
+                if editor != "Select...":
                     full_prompt += "\n\nContexto del editor:\n" + editors[editor]
                 full_prompt += "\n\nTranscripción:\n" + transcription
                 if extra_prompt:
                     full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
-                with st.spinner("🧠 Generando artículo con ChatGPT..."):
+                with st.spinner("🧠 Writing article with ChatGPT..."):
                     chat_response = client.chat.completions.create(
                         model="gpt-4",
                         messages=[
@@ -99,12 +99,12 @@ if video_file:
                     )
                     article = chat_response.choices[0].message.content
 
-                st.success("✅ Artículo generado")
-                st.subheader("🔎 Vista previa del artículo")
+                st.success("✅ Article ready")
+                st.subheader("🔎 Here is your article:")
                 st.markdown(article, unsafe_allow_html=True)
 
-                st.subheader("📰 Posibles titulares para Google Discover")
-                with st.spinner("✨ Generando titulares optimizados para Discover..."):
+                st.subheader("📰 Headlines ideas Google Discover")
+                with st.spinner("✨ Generating headlines for Google Discover..."):
                     discover_prompt = (
                         "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción: si la transcripción está en español, escribe los titulares en español; si la transcripción está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
                         "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
@@ -119,16 +119,16 @@ if video_file:
                     )
                     st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
 
-                st.subheader("💻 Código HTML")
+                st.subheader("💻 HTML code")
                 st.code(article, language='html')
 
-                st.subheader("📋 Código Markdown")
+                st.subheader("📋 Markdown code")
                 st.code(article)
 
-                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-                st.text_input("Presiona Ctrl+C para copiar el artículo desde aquí", value=article)
+                st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.text_input("Press Ctrl+C to copy the article from here", value=article)
 
             except Exception as e:
-                st.error(f"❌ Error al procesar el archivo: {str(e)}")
+                st.error(f"❌ Error processing file: {str(e)}")
             finally:
                 os.remove(tmp_path)
