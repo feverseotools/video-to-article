@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -139,18 +138,23 @@ if video_file:
                     )
                     article = chat_response.choices[0].message.content
 
+                st.session_state["article"] = article  # <-- Guarda el artículo en session_state
+
                 st.success("✅ Artículo generado")
-                st.subheader("🔎 Vista previa del artículo")
-                st.markdown(article, unsafe_allow_html=True)
-
-                st.subheader("📋 Código Markdown")
-                st.code(article)
-
-                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html", use_container_width=True)
-                st.text_input("Copia manual:", article, label_visibility="collapsed", disabled=True)
-                st.toast("Texto copiado (usa Ctrl+C en el cuadro de arriba)", icon="✅")
-
             except Exception as e:
                 st.error(f"❌ Error al procesar el archivo: {str(e)}")
             finally:
                 os.remove(tmp_path)
+
+        # Mostrar el artículo si existe en session_state
+        if "article" in st.session_state:
+            article = st.session_state["article"]
+            st.subheader("🔎 Vista previa del artículo")
+            st.markdown(article, unsafe_allow_html=True)
+
+            st.subheader("📋 Código Markdown")
+            st.code(article)
+
+            st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html", use_container_width=True)
+            st.text_input("Copia manual:", article, label_visibility="collapsed", disabled=True)
+            st.toast("Texto copiado (usa Ctrl+C en el cuadro de arriba)", icon="✅")
