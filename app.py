@@ -15,7 +15,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder 123", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.08)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -29,8 +29,46 @@ st.set_page_config(page_title="Convertir vídeo en texto")
 st.title("📝 Conversor de vídeo a texto para SMN")
 
 PROMPTS = {
-    "Valencia Secreta": "Prompt Valencia Secreta...",
-    "Barcelona Secreta": "Prompt Barcelona Secreta...",
+    "Valencia Secreta": """Tono informal, cercano y optimista, como si hablaras directamente al lector.
+
+Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
+
+Usa titulares H2 para separar secciones principales.
+
+Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
+
+Utiliza listas con emojis o viñetas si aporta dinamismo.
+
+Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸.
+
+Destaca ideas importantes con negritas, especialmente fechas, nombres propios, ubicaciones y frases clave.
+
+Menciona a menudo actividades relacionadas o recomendaciones extra con frases como “Quizás te interesa…” o “También puedes aprovechar para…”.
+
+Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
+
+Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia.""",
+
+    "Barcelona Secreta": """Tono informal, cercano y optimista, como si hablaras directamente al lector.
+
+Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
+
+Usa titulares H2 para separar secciones principales.
+
+Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
+
+Utiliza listas con emojis o viñetas si aporta dinamismo.
+
+Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸.
+
+Destaca ideas importantes con negritas, especialmente fechas, nombres propios, ubicaciones y frases clave.
+
+Menciona a menudo actividades relacionadas o recomendaciones extra con frases como “Quizás te interesa…” o “También puedes aprovechar para…”.
+
+Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
+
+Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia."""
+,
     "V2 Valencia Secreta": "Prompt V2 Valencia Secreta..."
 }
 
