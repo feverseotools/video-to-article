@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -69,8 +68,6 @@ if video_file:
                         transcript_response = client.audio.transcriptions.create(
                             model="whisper-1",
                             file=audio_file,
-                            filename=Path(tmp_path).name,
-                            file_content_type=mime_type,
                             response_format="json"
                         )
                     transcription = transcript_response.text
