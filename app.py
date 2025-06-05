@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 16:48h)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 16:51h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -106,7 +106,7 @@ if video_file:
                 st.subheader("📰 Posibles titulares para Google Discover")
                 with st.spinner("✨ Generando titulares optimizados para Discover..."):
                     discover_prompt = (
-                        "A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                        "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
                         "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
                         "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
                         "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
