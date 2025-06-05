@@ -229,9 +229,10 @@ if video_file:
     extra_prompt = ""
 
     if site != "Selecciona...":
-        editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
-        if editor:
-            extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
+    editor = st.selectbox("¿Quién es el editor del contenido?", ["", *EDITORS.keys()])
+
+    if editor:
+        extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
             if st.button("🎬 Generar artículo"):
                 try:
