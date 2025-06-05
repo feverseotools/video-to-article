@@ -15,7 +15,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.08)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.17)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -68,8 +68,7 @@ Menciona a menudo actividades relacionadas o recomendaciones extra con frases co
 Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
 
 Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia."""
-,
-    "V2 Valencia Secreta": "Prompt V2 Valencia Secreta..."
+
 }
 
 EDITORS = {
@@ -100,7 +99,7 @@ if video_file:
     if site != "Selecciona...":
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
 
-        if st.button("🎬 Generar artículo"):
+        if st.button("✍️ Generar artículo"):
             try:
                 with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
                     with open(tmp_path, "rb") as audio_file:
@@ -139,8 +138,9 @@ if video_file:
                 st.subheader("📋 Código Markdown")
                 st.code(article)
 
-                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
-                st.button("📋 Copiar artículo", on_click=lambda: st.toast("Texto copiado (usa Ctrl+C en el área Markdown)", icon="✅"))
+                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html", use_container_width=True)
+                st.text_input("Copia manual:", article, label_visibility="collapsed", disabled=True)
+                st.toast("Texto copiado (usa Ctrl+C en el cuadro de arriba)", icon="✅")
 
             except Exception as e:
                 st.error(f"❌ Error al procesar el archivo: {str(e)}")
