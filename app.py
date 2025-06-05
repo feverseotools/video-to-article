@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.34)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v05/06/2025 15:53h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -27,59 +27,18 @@ client = OpenAI()
 st.set_page_config(page_title="Convertir vídeo en texto")
 st.title("📝 Conversor de vídeo a texto para SMN")
 
-PROMPTS = {
-    "Valencia Secreta": """Tono informal, cercano y optimista, como si hablaras directamente al lector.
+# --- CARGA DE PROMPTS EXTERNOS ---
+def load_prompt(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
 
-Primero, incluye un texto de 150 palabras aproximadamente que corresponde al campo de Secondary title. Indícalo así.
-
-Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
-
-Después, añade un siguiente párrafo (con salto de línea) que ponga al lector en contexto de lo que va a leer en el contenido.
-
-Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido). No uses emoji en los titulares H2 ni H3.
-
-Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
-
-Cada H2 y H3 debe tener a continuación al menos 2 párrafos de texto (con salto de línea).
-
-Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸. Pero cada dato va con un salto de línea simple, uno tras el otro.
-
-Destaca ideas importantes con negritas, especialmente fechas, nombres propios, ubicaciones y frases clave.
-
-Menciona a menudo actividades relacionadas o recomendaciones extra con frases como “Quizás te interesa…” o “También puedes aprovechar para…”.
-
-Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
-
-Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia.""",
-
-    "Barcelona Secreta": """Tono informal, cercano y optimista, como si hablaras directamente al lector.
-
-Primero, incluye un texto de 150 palabras aproximadamente que corresponde al campo de Secondary title. Indícalo así.
-
-Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
-
-Después, añade un siguiente párrafo (con salto de línea) que ponga al lector en contexto de lo que va a leer en el contenido.
-
-Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido). No uses emoji en los titulares H2 ni H3.
-
-Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
-
-Cada H2 y H3 debe tener a continuación al menos 2 párrafos de texto (con salto de línea).
-
-Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸. Pero cada dato va con un salto de línea simple, uno tras el otro.
-
-Destaca ideas importantes con negritas, especialmente fechas, nombres propios, ubicaciones y frases clave.
-
-Menciona a menudo actividades relacionadas o recomendaciones extra con frases como “Quizás te interesa…” o “También puedes aprovechar para…”.
-
-Incluye referencias culturales locales cuando sea posible (costumbres, barrios, expresiones como "esmorzaret").
-
-Finaliza con una llamada a la acción suave o invitación a disfrutar de la experiencia."""
-
+sites = {
+    "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
+    "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt")
 }
 
-EDITORS = {
-    "Álvaro Llagunes": "Te llamas Álvaro Llagunes, eres redactor en Secret Media Network con formación en Periodismo y Cine Documental, y muchos años de experiencia escribiendo en medios digitales como Madrid Secreto, Valencia Secreta y Barcelona Secreta, donde desarrollas contenidos editoriales, SEO, branded content, redacción de guiones y gestión de redes sociales; fuiste redactor ejecutivo entre 2019 y 2020, coordinando equipos y contenidos para los medios en español del grupo; trabajaste como periodista en prácticas en TVE (Informe Semanal) elaborando reportajes y entrevistas; has sido asistente de marketing y comunicación online en Dinamarca para la empresa Princh A/S, centrado en comunicación interna y redes sociales; y redactor de contenidos para la agencia CONNEXT en Valencia, enfocado en estrategias digitales; tu estilo de escritura se caracteriza por ser claro, directo y contextualizado, como en artículos sobre el acceso al circuito de Montmeló por 5 euros, la evolución de los alquileres en Barcelona en la última década o la historia del mejor barman de España trabajando en Paradiso, uno de los mejores bares del mundo, todo lo cual te posiciona como un profesional versátil con experiencia en redacción periodística, contenido digital y enfoque creativo, preparado para transformar transcripciones en piezas originales de más de 400 palabras adaptadas al estilo del medio."
+editors = {
+    "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt")
 }
 
 video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
@@ -100,8 +59,8 @@ if video_file:
     if not mime_type:
         mime_type = "video/mp4"
 
-    editor = st.selectbox("¿Quién es el editor del contenido?", ["Ningun@", *EDITORS.keys()])
-    site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *PROMPTS.keys()])
+    editor = st.selectbox("¿Quién es el editor del contenido?", ["Ningun@", *editors.keys()])
+    site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", *sites.keys()])
 
     if site != "Selecciona...":
         extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
@@ -120,9 +79,9 @@ if video_file:
                 st.success("✅ Transcripción completada")
                 st.text_area("Texto transcrito:", transcription, height=200)
 
-                full_prompt = PROMPTS[site]
+                full_prompt = sites[site]
                 if editor != "Ningun@":
-                    full_prompt += "\n\nContexto del editor:\n" + EDITORS[editor]
+                    full_prompt += "\n\nContexto del editor:\n" + editors[editor]
                 full_prompt += "\n\nTranscripción:\n" + transcription
                 if extra_prompt:
                     full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
@@ -138,23 +97,37 @@ if video_file:
                     )
                     article = chat_response.choices[0].message.content
 
-                st.session_state["article"] = article  # <-- Guarda el artículo en session_state
-
                 st.success("✅ Artículo generado")
+                st.subheader("🔎 Vista previa del artículo")
+                st.markdown(article, unsafe_allow_html=True)
+
+                st.subheader("📰 Posibles titulares para Google Discover")
+                discover_prompt = (
+                    "A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                    "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
+                    "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
+                    "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
+                    "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
+                    "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+                )
+                discover_response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "user", "content": discover_prompt}
+                    ]
+                )
+                st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+
+                st.subheader("💻 Código HTML")
+                st.code(article, language='html')
+
+                st.subheader("📋 Código Markdown")
+                st.code(article)
+
+                st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.text_input("Presiona Ctrl+C para copiar el artículo desde Markdown", value=article)
+
             except Exception as e:
                 st.error(f"❌ Error al procesar el archivo: {str(e)}")
             finally:
                 os.remove(tmp_path)
-
-        # Mostrar el artículo si existe en session_state
-        if "article" in st.session_state:
-            article = st.session_state["article"]
-            st.subheader("🔎 Vista previa del artículo")
-            st.markdown(article, unsafe_allow_html=True)
-
-            st.subheader("📋 Código Markdown")
-            st.code(article)
-
-            st.download_button("⬇️ Descargar como HTML", data=article, file_name="articulo.html", mime="text/html", use_container_width=True)
-            st.text_input("Copia manual:", article, label_visibility="collapsed", disabled=True)
-            st.toast("Texto copiado (usa Ctrl+C en el cuadro de arriba)", icon="✅")
