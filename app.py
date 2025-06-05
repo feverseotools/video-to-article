@@ -15,7 +15,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.17)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v.05.06.2025 15.27)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -31,13 +31,17 @@ st.title("📝 Conversor de vídeo a texto para SMN")
 PROMPTS = {
     "Valencia Secreta": """Tono informal, cercano y optimista, como si hablaras directamente al lector.
 
+Primero, incluye un texto de 150 palabras aproximadamente que corresponde al campo de Secondary title. Indícalo así.
+
 Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
 
-Después, otro párrafo que ponga al lector en contexto de lo que va a leer en el contenido.
+Después, añade un siguiente párrafo (con salto de línea) que ponga al lector en contexto de lo que va a leer en el contenido.
 
-Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido).
+Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido). No uses emoji en los titulares H2 ni H3.
 
 Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
+
+Cada H2 y H3 debe tener a continuación al menos 2 párrafos de texto (con salto de línea).
 
 Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸.
 
