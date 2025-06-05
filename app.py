@@ -15,7 +15,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder ABC DEF", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder 123", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -69,8 +69,6 @@ if video_file:
                         transcript_response = client.audio.transcriptions.create(
                             model="whisper-1",
                             file=audio_file,
-                            filename=Path(tmp_path).name,
-                            file_content_type=mime_type,
                             response_format="json"
                         )
                     transcription = transcript_response.text
