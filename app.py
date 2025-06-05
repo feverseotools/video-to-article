@@ -33,11 +33,11 @@ PROMPTS = {
 
 Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
 
-Usa titulares H2 para separar secciones principales.
+Después, otro párrafo que ponga al lector en contexto de lo que va a leer en el contenido.
+
+Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido).
 
 Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
-
-Utiliza listas con emojis o viñetas si aporta dinamismo.
 
 Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸.
 
@@ -53,11 +53,11 @@ Finaliza con una llamada a la acción suave o invitación a disfrutar de la expe
 
 Introducción breve que conecta emocionalmente o con alguna referencia cultural o estacional (por ejemplo: “Llega el otoño…”, “¿Quién no querría volver a la infancia?”).
 
-Usa titulares H2 para separar secciones principales.
+Después, otro párrafo que ponga al lector en contexto de lo que va a leer en el contenido.
+
+Usa titulares H2 para separar secciones principales (pero no incluyas más de 3 H2 por contenido).
 
 Dentro de cada H2, emplea subtítulos H3 cuando haya múltiples elementos (por ejemplo, una lista de lugares, fechas o actividades).
-
-Utiliza listas con emojis o viñetas si aporta dinamismo.
 
 Siempre que sea útil, incluye una sección de "Información práctica" con iconos tipo 📍, 📅, ⏰, 💸.
 
