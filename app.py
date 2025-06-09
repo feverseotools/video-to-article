@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v09/06/2025 17:42h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v09/06/2025 17:42h SIN TEXT EDITOR)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -104,18 +104,6 @@ if video_file:
                 st.subheader("🔎 Here is your article:")
                 st.markdown(article, unsafe_allow_html=True)
 
-                # Section: Edit article
-st.subheader("✏️ Edit the article here:")
-
-if "edited_article" not in st.session_state:
-    st.session_state.edited_article = article
-
-edited_article = st.text_area("Editor", value=st.session_state.edited_article, height=500)
-
-if edited_article != st.session_state.edited_article and edited_article is not None:
-    st.session_state.edited_article = edited_article
-
-
                 st.subheader("📰 Headlines ideas Google Discover")
                 with st.spinner("✨ Generating headlines for Google Discover..."):
                     discover_prompt = (
@@ -138,8 +126,8 @@ if edited_article != st.session_state.edited_article and edited_article is not N
                 st.subheader("📋 Markdown code")
                 st.code(article)
 
-                st.download_button("⬇️ Download as HTML", data=st.session_state.edited_article, file_name="articulo.html", mime="text/html")
-                st.text_input("Press Ctrl+C to copy the article from here", value=st.session_state.edited_article)
+                st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.text_input("Press Ctrl+C to copy the article from here", value=article)
 
             except Exception as e:
                 st.error(f"❌ Error processing file: {str(e)}")
