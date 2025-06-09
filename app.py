@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,8 +12,9 @@ import mimetypes
 PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v09/06/2025 16:26h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v09/06/2025 10:15h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -23,31 +23,54 @@ if not st.session_state.authenticated:
 
 client = OpenAI()
 
-st.set_page_config(page_title="Convertir vídeo en texto")
-st.title("📝 Conversor de vídeo a texto para SMN")
+# --- CONFIGURACIÓN INICIAL ---
+st.set_page_config(page_title="Convert Video into Text")
+st.title("📝 Video > Text AI Converter for SMN")
 
-from prompts import PROMPTS
-from editors import EDITORS
+# --- CARGA DE PROMPTS EXTERNOS ---
+def load_prompt(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
 
-video_file = st.file_uploader("Sube un vídeo (.mp4, .mov, .avi...):", type=None)
+sites = {
+    "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
+    "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
+    "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
+    "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
+}
+
+editors = {
+    "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
+    "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
+}
+
+video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
         tmp.write(video_file.read())
         tmp_path = tmp.name
 
+    file_size = os.path.getsize(tmp_path)
+    st.info(f"File size: {file_size} bytes")
+
+    if file_size == 0:
+        st.error("❌ File is empty. Please, upload a video with audio.")
+        st.stop()
+
     mime_type, _ = mimetypes.guess_type(tmp_path)
     if not mime_type:
         mime_type = "video/mp4"
 
-    editor = st.selectbox("¿Quién es el editor del contenido?", ["Ningun@", *EDITORS.keys()])
-    site = st.selectbox("¿Para qué site es este artículo?", ["Selecciona...", "Valencia Secreta", "Barcelona Secreta"])
+    editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
+    site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 
-    if site != "Selecciona...":
-        extra_prompt = st.text_area("¿Quieres añadir instrucciones adicionales al prompt? (opcional)")
-        if st.button("✍️ Generar artículo"):
+    if site != "Select...":
+        extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
+
+        if st.button("✍️ Create article"):
             try:
-                with st.spinner("⏳ Transcribiendo vídeo con Whisper..."):
+                with st.spinner("⏳ Getting transcription of the video with Whisper..."):
                     with open(tmp_path, "rb") as audio_file:
                         transcript_response = client.audio.transcriptions.create(
                             model="whisper-1",
@@ -55,18 +78,19 @@ if video_file:
                             response_format="json"
                         )
                     transcription = transcript_response.text
-                st.success("✅ Transcripción completada")
-                st.text_area("Texto transcrito:", transcription, height=200)
 
-                full_prompt = PROMPTS[site]
-                if editor != "Ningun@":
-                    full_prompt += "\n\nContexto del editor:\n" + EDITORS[editor]
+                st.success("✅ Transcription completed")
+                st.text_area("Text of the video:", transcription, height=200)
+
+                full_prompt = sites[site]
+                if editor != "Select...":
+                    full_prompt += "\n\nContexto del editor:\n" + editors[editor]
                 full_prompt += "\n\nTranscripción:\n" + transcription
                 if extra_prompt:
                     full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
-                with st.spinner("🧠 Generando artículo con ChatGPT..."):
-                    article_response = client.chat.completions.create(
+                with st.spinner("🧠 Writing article with ChatGPT..."):
+                    chat_response = client.chat.completions.create(
                         model="gpt-4",
                         messages=[
                             {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
@@ -74,58 +98,38 @@ if video_file:
                         ],
                         temperature=0.7
                     )
-                    article = article_response.choices[0].message.content
+                    article = chat_response.choices[0].message.content
 
-                st.success("✅ Artículo generado")
-
-                st.subheader("🏷 Secondary title (subtítulo del artículo)")
-                secondary_title = article.split("\n")[0].strip("# ").strip()
-                st.text_input("Subtítulo sugerido:", value=secondary_title)
-
-                st.subheader("🔎 Vista previa del artículo")
+                st.success("✅ Article ready")
+                st.subheader("🔎 Here is your article:")
                 st.markdown(article, unsafe_allow_html=True)
 
-                st.subheader("✏️ Edita el artículo aquí (HTML / Markdown):")
-                if "edited_article" not in st.session_state:
-                    st.session_state.edited_article = article
-
-                edited_article = st.text_area("Editor de contenido", value=st.session_state.edited_article, height=500)
-
-                if edited_article != st.session_state.edited_article and edited_article is not None:
-                    st.session_state.edited_article = edited_article
-
-                st.subheader("💻 Código HTML actualizado")
-                st.code(st.session_state.edited_article, language="html")
-
-                st.subheader("📋 Código Markdown actualizado")
-                st.code(st.session_state.edited_article)
-
-                st.download_button("⬇️ Descargar como HTML", data=st.session_state.edited_article, file_name="articulo.html", mime="text/html")
-                st.text_input("Presiona Ctrl+C para copiar el artículo desde aquí", value=st.session_state.edited_article)
-
-                st.subheader("✨ Posibles titulares para Google Discover")
-                with st.spinner("🧠 Generando titulares..."):
-                    discover_instructions = (
-                        "A partir del siguiente artículo, genera 5 titulares optimizados para Google Discover. "
-                        "Ten en cuenta las siguientes instrucciones:\n\n"
-                        "Un artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
-                        "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte "
-                        "curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, "
-                        "marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, "
-                        "evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR."
+                st.subheader("📰 Headlines ideas Google Discover")
+                with st.spinner("✨ Generating headlines for Google Discover..."):
+                    discover_prompt = (
+                        "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción: si la transcripción está en español, escribe los titulares en español; si la transcripción está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                        "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
+                        "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
+                        "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
+                        "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
+                        "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
                     )
-                    discover_prompt = discover_instructions + "\n\nArtículo:\n" + st.session_state.edited_article
                     discover_response = client.chat.completions.create(
                         model="gpt-4",
-                        messages=[
-                            {"role": "system", "content": "Eres un experto en redacción de titulares optimizados para Google Discover."},
-                            {"role": "user", "content": discover_prompt}
-                        ],
-                        temperature=0.7
+                        messages=[{"role": "user", "content": discover_prompt}]
                     )
-                    st.markdown(discover_response.choices[0].message.content)
+                    st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+
+                st.subheader("💻 HTML code")
+                st.code(article, language='html')
+
+                st.subheader("📋 Markdown code")
+                st.code(article)
+
+                st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+                st.text_input("Press Ctrl+C to copy the article from here", value=article)
 
             except Exception as e:
-                st.error(f"❌ Error al procesar el archivo: {str(e)}")
+                st.error(f"❌ Error processing file: {str(e)}")
             finally:
                 os.remove(tmp_path)
