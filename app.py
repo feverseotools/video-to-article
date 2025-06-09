@@ -8,14 +8,13 @@ import tempfile
 import os
 from pathlib import Path
 import mimetypes
-from streamlit_quill import st_quill
 
 # --- AUTENTICACIÓN SIMPLE ---
 PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Introduce la contraseña para acceder (v09/06/2025 16:19h)", type="password")
+    pw = st.text_input("Introduce la contraseña para acceder (v09/06/2025 16:26h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -86,11 +85,11 @@ if video_file:
                 st.subheader("🔎 Vista previa del artículo")
                 st.markdown(article, unsafe_allow_html=True)
 
-                st.subheader("✏️ Edita el artículo aquí:")
+                st.subheader("✏️ Edita el artículo aquí (HTML / Markdown):")
                 if "edited_article" not in st.session_state:
                     st.session_state.edited_article = article
 
-                edited_article = st_quill(value=st.session_state.edited_article, html=True)
+                edited_article = st.text_area("Editor de contenido", value=st.session_state.edited_article, height=500)
 
                 if edited_article != st.session_state.edited_article and edited_article is not None:
                     st.session_state.edited_article = edited_article
