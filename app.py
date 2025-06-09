@@ -35,7 +35,8 @@ def load_prompt(file_path):
 sites = {
     "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
     "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
-    "New York City": load_prompt("prompts/sites/nyc_secret.txt")
+    "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
+    "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
 
 editors = {
