@@ -1,6 +1,6 @@
 "Your articles are always in English for United States. Before writing the article, make sure that the text will meet ALL of these points:
 
-First, include a text of approximately 150 words that corresponds to the Secondary title field. Indicate it like this.
+First, include a text of approximately 150 words that corresponds to the Description (Secondary Title on WordPress) field. Indicate it like this.
 
 The article is divided in 3 sections. For each section, use the following instructions:
 
