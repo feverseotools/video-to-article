@@ -93,7 +93,7 @@ if st.button("✍️ Create article"):
             full_prompt += "\n\nContexto del editor:\n" + editors[editor]
         full_prompt += "\n\nTranscripción:\n" + transcription
         if category == "Gastronomía (restaurantes, bares, street food)":
-         category_prompt = load_prompt("category/food.txt")
+         category_prompt = load_prompt("prompts/category/food.txt")
          full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
         if extra_prompt:
             full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
