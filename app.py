@@ -54,6 +54,12 @@ category = {
     "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
 }
 
+# Languages
+
+languages = {
+    "English for US": load_prompt("prompts/languages/en-us.txt"),
+}
+
 video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
@@ -75,13 +81,7 @@ if video_file:
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
     category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)"])
-
-    # Load available languages from /prompts/languages/*.txt
-    language_files = list(Path("prompts/languages").glob("*.txt"))
-    language_options = ["Select language..."] + [file.stem for file in language_files]
-
-    # Language selector
-    language_selected = st.selectbox("Select language for article output:", language_options)
+    language_selected = st.selectbox("Select language for article output:", ["Select...", *languages.keys()])
 
 
     if site != "Select...":
