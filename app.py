@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v09/06/2025 17:42h SIN TEXT EDITOR)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v10/06/2025 10:05h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -65,71 +65,85 @@ if video_file:
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 
-    if site != "Select...":
-        extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
+if site != "Select...":
+    extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
 
-        if st.button("✍️ Create article"):
-            try:
-                with st.spinner("⏳ Getting transcription of the video with Whisper..."):
-                    with open(tmp_path, "rb") as audio_file:
-                        transcript_response = client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_file,
-                            response_format="json"
-                        )
-                    transcription = transcript_response.text
-
-                st.success("✅ Transcription completed")
-                st.text_area("Text of the video:", transcription, height=200)
-
-                full_prompt = sites[site]
-                if editor != "Select...":
-                    full_prompt += "\n\nContexto del editor:\n" + editors[editor]
-                full_prompt += "\n\nTranscripción:\n" + transcription
-                if extra_prompt:
-                    full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
-
-                with st.spinner("🧠 Writing article with ChatGPT..."):
-                    chat_response = client.chat.completions.create(
-                        model="gpt-4",
-                        messages=[
-                            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
-                            {"role": "user", "content": full_prompt}
-                        ],
-                        temperature=0.7
+    if st.button("✍️ Create article"):
+        try:
+            with st.spinner("⏳ Getting transcription of the video with Whisper..."):
+                with open(tmp_path, "rb") as audio_file:
+                    transcript_response = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_file,
+                        response_format="json"
                     )
-                    article = chat_response.choices[0].message.content
+                transcription = transcript_response.text
 
-                st.success("✅ Article ready")
-                st.subheader("🔎 Here is your article:")
-                st.markdown(article, unsafe_allow_html=True)
+            st.success("✅ Transcription completed")
+            st.text_area("Text of the video:", transcription, height=200)
 
-                st.subheader("📰 Headlines ideas Google Discover")
-                with st.spinner("✨ Generating headlines for Google Discover..."):
-                    discover_prompt = (
-                        "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción: si la transcripción está en español, escribe los titulares en español; si la transcripción está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
-                        "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
-                        "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
-                        "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
-                        "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
-                        "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
-                    )
-                    discover_response = client.chat.completions.create(
-                        model="gpt-4",
-                        messages=[{"role": "user", "content": discover_prompt}]
-                    )
-                    st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+            full_prompt = sites[site]
+            if editor != "Select...":
+                full_prompt += "\n\nContexto del editor:\n" + editors[editor]
+            full_prompt += "\n\nTranscripción:\n" + transcription
+            if extra_prompt:
+                full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
-                st.subheader("💻 HTML code")
-                st.code(article, language='html')
+            with st.spinner("🧠 Writing article with ChatGPT..."):
+                chat_response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                        {"role": "user", "content": full_prompt}
+                    ],
+                    temperature=0.7
+                )
+                article = chat_response.choices[0].message.content
 
-                st.subheader("📋 Markdown code")
-                st.code(article)
+            st.success("✅ Article ready")
+            st.subheader("🔎 Here is your article:")
+            st.markdown(article, unsafe_allow_html=True)
 
-                st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
-                st.text_input("Press Ctrl+C to copy the article from here", value=article)
+            # Section: Edit article
+            st.subheader("✏️ Edit the article here:")
 
-            except Exception as e:
-                st.error(f"❌ Error processing file: {str(e)}")
-            finally:
-                os.remove(tmp_path)
+            if "edited_article" not in st.session_state:
+                st.session_state.edited_article = article
+
+            edited_article = st.text_area("Editor", value=st.session_state.edited_article, height=500)
+
+            if edited_article != st.session_state.edited_article and edited_article is not None:
+                st.session_state.edited_article = edited_article
+
+            st.subheader("📰 Headlines ideas Google Discover")
+            with st.spinner("✨ Generating headlines for Google Discover..."):
+                discover_prompt = (
+                    "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción: si la transcripción está en español, escribe los titulares en español; si la transcripción está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                    "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
+                    "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
+                    "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
+                    "y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, "
+                    "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+                )
+                discover_response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": discover_prompt}]
+                )
+                st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+
+            st.subheader("💻 HTML code")
+            st.code(article, language='html')
+
+            st.subheader("📋 Markdown code")
+            st.code(article)
+
+            # Descargar versión editada como HTML
+            st.download_button("⬇️ Download as HTML", data=st.session_state.edited_article, file_name="articulo.html", mime="text/html")
+
+            # Caja de texto para copiar versión editada
+            st.text_input("📋 Press Ctrl+C to copy the article from here", value=st.session_state.edited_article)
+
+        except Exception as e:
+            st.error(f"❌ Error processing file: {str(e)}")
+        finally:
+            os.remove(tmp_path)
