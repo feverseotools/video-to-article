@@ -47,6 +47,7 @@ editors = {
 video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
         tmp.write(video_file.read())
         tmp_path = tmp.name
@@ -65,7 +66,8 @@ if video_file:
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 
-if site != "Select...":
+    if site != "Select...":
+        
     extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
 
     if st.button("✍️ Create article"):
