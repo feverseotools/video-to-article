@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v10/06/2025 15:02h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v10/06/2025 15:12h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -81,7 +81,7 @@ if video_file:
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
     category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)"])
-    language_selected = st.selectbox("Select language for article output:", ["Select...", *languages.keys()])
+    language = st.selectbox("Select language for article output:", ["Select language...", *languages.keys()])
 
 
     if site != "Select...":
@@ -112,11 +112,9 @@ if st.button("✍️ Create article"):
          category_prompt = load_prompt("prompts/category/food.txt")
          full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
 
-        # Add language prompt if selected
-        if language_selected != "Select output language...":
-         language_prompt_path = Path("prompts/languages") / f"{language_selected}.txt"
-         language_prompt = load_prompt(language_prompt_path)
-         full_prompt += "\n\nLanguage instructions:\n" + language_prompt
+        if language == "English (United States)":
+         language_prompt = load_prompt("prompts/languages/en-us.txt")
+         full_prompt += "\n\nIdioma del artículo:\n" + language_prompt
 
         if extra_prompt:
             full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
