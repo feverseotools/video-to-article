@@ -44,6 +44,10 @@ editors = {
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
 }
 
+category = {
+    "Gastronomía (restaurantes, bares, street food)": load_prompt("prompts/category/food.txt"),
+}
+
 video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
 
 if video_file:
@@ -64,6 +68,7 @@ if video_file:
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
+    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomía (restaurantes, bares, street food)"])
 
     if site != "Select...":
         extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
@@ -87,6 +92,9 @@ if st.button("✍️ Create article"):
         if editor != "Select...":
             full_prompt += "\n\nContexto del editor:\n" + editors[editor]
         full_prompt += "\n\nTranscripción:\n" + transcription
+        if category == "Gastronomía (restaurantes, bares, street food)":
+         category_prompt = load_prompt("category/food.txt")
+         full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
         if extra_prompt:
             full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
