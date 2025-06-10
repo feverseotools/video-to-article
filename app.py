@@ -80,6 +80,12 @@ if st.button("✍️ Create article"):
             transcription = transcript_response.text
 
         st.success("✅ Transcription completed")
+
+        # Word count
+        word_count = len(article.split())
+        st.info(f"📝 Word count: {word_count} words")
+
+
         st.text_area("Text of the video:", transcription, height=200)
 
         full_prompt = sites[site]
