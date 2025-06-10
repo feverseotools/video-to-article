@@ -32,6 +32,8 @@ def load_prompt(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
+# Where will be published the article? (site) We use this info to adjust the tone and the writing style of the article
+
 sites = {
     "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
     "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
@@ -39,13 +41,17 @@ sites = {
     "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
 
+# Who wil sign the article? (editor) We use this info to adjust the tone and the writing style of the article (more personal touch)
+
 editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
 }
 
+# Category selection to adjust the output of the article according to the type of content
+
 category = {
-    "Gastronomía (restaurantes, bares, street food)": load_prompt("prompts/category/food.txt"),
+    "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
 }
 
 video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
@@ -68,7 +74,15 @@ if video_file:
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
-    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomía (restaurantes, bares, street food)"])
+    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)"])
+
+    # Load available languages from /prompts/languages/*.txt
+    language_files = list(Path("prompts/languages").glob("*.txt"))
+    language_options = ["Select language..."] + [file.stem for file in language_files]
+
+    # Language selector
+    language_selected = st.selectbox("Select language for article output:", language_options)
+
 
     if site != "Select...":
         extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
@@ -89,12 +103,21 @@ if st.button("✍️ Create article"):
         st.text_area("Text of the video:", transcription, height=200)
 
         full_prompt = sites[site]
+
         if editor != "Select...":
             full_prompt += "\n\nContexto del editor:\n" + editors[editor]
         full_prompt += "\n\nTranscripción:\n" + transcription
-        if category == "Gastronomía (restaurantes, bares, street food)":
+
+        if category == "Gastronomy (restaurants, bars, street food)":
          category_prompt = load_prompt("prompts/category/food.txt")
          full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
+
+        # Add language prompt if selected
+        if language_selected != "Select output language...":
+         language_prompt_path = Path("prompts/languages") / f"{language_selected}.txt"
+         language_prompt = load_prompt(language_prompt_path)
+         full_prompt += "\n\nLanguage instructions:\n" + language_prompt
+
         if extra_prompt:
             full_prompt += "\n\nInstrucciones adicionales del editor:\n" + extra_prompt
 
