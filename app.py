@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v10/06/2025 11:31h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v10/06/2025 11:42h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -81,11 +81,6 @@ if st.button("✍️ Create article"):
 
         st.success("✅ Transcription completed")
 
-        # Word count
-        word_count = len(article.split())
-        st.info(f"📝 Word count: {word_count} words")
-
-
         st.text_area("Text of the video:", transcription, height=200)
 
         full_prompt = sites[site]
@@ -104,7 +99,10 @@ if st.button("✍️ Create article"):
                 ],
                 temperature=0.7
             )
-            article = chat_response.choices[0].message.content
+        article = chat_response.choices[0].message.content
+        # ✅ Word count (calculated after article is generated)
+        word_count = len(article.split())
+        st.info(f"📝 Word count: {word_count} words")
 
         st.success("✅ Article ready")
         st.subheader("🔎 Here is your article:")
