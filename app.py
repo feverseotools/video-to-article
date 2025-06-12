@@ -25,7 +25,7 @@ client = OpenAI()
 
 # --- CONFIGURACIÓN INICIAL ---
 st.set_page_config(page_title="STAGING Convert Video into Text")
-st.title("📝 Video > Text AI Converter for SMN")
+st.title("STAGING📝 Video > Text AI Converter for SMN")
 
 # --- CARGA DE PROMPTS EXTERNOS ---
 def load_prompt(file_path):
