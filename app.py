@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v12/06/2025 11:58h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v12/06/2025 17:22h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -139,7 +139,7 @@ if st.button("✍️ Create article"):
             chat_response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                    {"role": "system", "content": "Eres un redactor profesional especializado en contenido local. Escribe siempre el artículo en el idioma del sitio seleccionado."},
                     {"role": "user", "content": full_prompt}
                 ],
                 temperature=0.7
