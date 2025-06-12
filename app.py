@@ -70,6 +70,12 @@ if video_file:
 
     file_size = os.path.getsize(tmp_path)
     st.info(f"File size: {file_size} bytes")
+    MAX_WHISPER_SIZE_MB = 25
+    MAX_WHISPER_SIZE_BYTES = MAX_WHISPER_SIZE_MB * 1024 * 1024
+    if file_size > MAX_WHISPER_SIZE_BYTES:
+     st.error(f"❌ File exceeds maximum size allowed by Whisper API ({MAX_WHISPER_SIZE_MB} MB). Please upload a smaller video.")
+     st.stop()
+
 
     if file_size == 0:
         st.error("❌ File is empty. Please, upload a video with audio.")
