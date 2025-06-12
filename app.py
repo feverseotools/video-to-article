@@ -156,7 +156,7 @@ if st.button("✍️ Create article"):
         st.subheader("📰 Headlines ideas Google Discover")
         with st.spinner("✨ Generating headlines for Google Discover..."):
             discover_prompt = (
-                "(Adapta el output de este prompt al idioma en el que está el texto de la transcripción: si la transcripción está en español, escribe los titulares en español; si la transcripción está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
+                "(Adapta el output de este prompt al idioma en el que está el texto del artículo final (el idioma que el editor ha seleccionado como idioma del artículo): si el contenido está en español, escribe los titulares en español; si el contenido está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones:"
                 "\n\nUn artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado "
                 "con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, "
                 "urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales "
