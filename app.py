@@ -52,6 +52,7 @@ editors = {
 
 category = {
     "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
+    "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
 }
 
 # Languages
@@ -87,7 +88,7 @@ if video_file:
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
-    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)"])
+    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)", "Sports for Secret Media"])
     language = st.selectbox("Select language for article output:", ["Select language...", *languages.keys()])
 
 
@@ -117,6 +118,10 @@ if st.button("✍️ Create article"):
 
         if category == "Gastronomy (restaurants, bars, street food)":
          category_prompt = load_prompt("prompts/category/food.txt")
+         full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
+
+        if category == "Sports for Secret Media":
+         category_prompt = load_prompt("prompts/category/sports-smn.txt")
          full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
 
         if language == "English (United States)":
