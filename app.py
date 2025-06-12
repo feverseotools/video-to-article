@@ -139,7 +139,7 @@ if st.button("✍️ Create article"):
             chat_response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "Eres un redactor profesional especializado en contenido local. Escribe siempre el artículo en el idioma del sitio seleccionado."},
+                    {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
                     {"role": "user", "content": full_prompt}
                 ],
                 temperature=0.7
