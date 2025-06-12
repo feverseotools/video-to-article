@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v12/06/2025 09:02h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v12/06/2025 09:14h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -59,6 +59,7 @@ category = {
 languages = {
     "English for US": load_prompt("prompts/languages/en-us.txt"),
     "Español para España": load_prompt("prompts/languages/es-sp.txt"),
+    "Catalán": load_prompt("prompts/languages/ca-sp.txt"),
 }
 
 video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
@@ -125,6 +126,10 @@ if st.button("✍️ Create article"):
 
         if language == "Español (España)":
          language_prompt = load_prompt("prompts/languages/es-sp.txt")
+         full_prompt += "\n\nIdioma del artículo:\n" + language_prompt
+
+        if language == "Catalán":
+         language_prompt = load_prompt("prompts/languages/ca-sp.txt")
          full_prompt += "\n\nIdioma del artículo:\n" + language_prompt
 
         if extra_prompt:
