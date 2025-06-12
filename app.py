@@ -24,7 +24,7 @@ if not st.session_state.authenticated:
 client = OpenAI()
 
 # --- CONFIGURACIÓN INICIAL ---
-st.set_page_config(page_title="Convert Video into Text")
+st.set_page_config(page_title="STAGING Convert Video into Text")
 st.title("📝 Video > Text AI Converter for SMN")
 
 # --- CARGA DE PROMPTS EXTERNOS ---
