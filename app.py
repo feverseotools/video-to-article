@@ -37,6 +37,7 @@ def load_prompt(file_path):
 sites = {
     "Valencia Secreta": load_prompt("prompts/sites/valencia_secreta.txt"),
     "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
+    "Madrid Secreto": load_prompt("prompts/sites/madrid_secreto.txt"),
     "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
     "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
@@ -46,6 +47,7 @@ sites = {
 editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
+    "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt"),
 }
 
 # Category selection to adjust the output of the article according to the type of content
