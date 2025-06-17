@@ -4,12 +4,13 @@ Historial de cambios y mejoras de la herramienta "Video > Text AI Converter for 
 
 ---
 
-## Versión inicial (06/2025)
+## Versión actual (06/2025)
 
 - Conversión de vídeo a transcripción con Whisper API.
 - Generación de artículo con ChatGPT (GPT-4) a partir de la transcripción.
 - Prompts personalizados por **site**.
 - Prompts personalizados por **editor**.
+- Prompts personalizados por **categoría del artículo**.
 - Posibilidad de añadir instrucciones adicionales al prompt.
 - Copia del artículo en Markdown + descarga en HTML.
 

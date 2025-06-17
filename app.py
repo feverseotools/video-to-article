@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v13/06/2025 12:44h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v17/06/2025 15:25h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -56,6 +56,7 @@ category = {
     "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
+    "Generic (use with caution)": load_prompt("prompts/category/generic.txt"),
 }
 
 # Languages
@@ -91,7 +92,7 @@ if video_file:
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
-    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)", "Sports for Secret Media", "Housing situation in big cities"])
+    category = st.selectbox("Select the type of content:", ["Select category...", "Gastronomy (restaurants, bars, street food)", "Sports for Secret Media", "Housing situation in big cities", "Generic (use with caution)"])
     language = st.selectbox("Select language for article output:", ["Select language...", *languages.keys()])
 
 
@@ -129,6 +130,10 @@ if st.button("✍️ Create article"):
 
         if category == "Housing situation in big cities":
          category_prompt = load_prompt("prompts/category/problemas-vivienda.txt")
+         full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
+
+        if category == "Generic (use with caution)":
+         category_prompt = load_prompt("prompts/category/generic.txt")
          full_prompt += "\n\nContexto de la categoría:\n" + category_prompt
 
         if language == "English (United States)":
