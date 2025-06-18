@@ -65,7 +65,7 @@ if video_file:
         tmp_path = tmp.name
     file_size = os.path.getsize(tmp_path)
     st.info(f"File size: {file_size} bytes")
-    if image_file is not None:
+    if image_file is not None and image_file.size == 0:
      if image_file.size == 0:
         st.error("⚠️ Uploaded image is empty.")
         st.stop()
