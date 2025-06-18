@@ -262,4 +262,5 @@ if st.button("✍️ Create article"):
         else:
             st.error(f"❌ General error: {e}")
     finally:
-        os.remove(tmp_path)
+        if "tmp_path" in locals():
+            os.remove(tmp_path)
