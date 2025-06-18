@@ -11,7 +11,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 16:14h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 16:23h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -100,8 +100,8 @@ elif image_file:
                     st.success("✅ Image description generated")
                 except Exception as e:
                     st.error(f"❌ Error during image analysis: {e}")
-else:
-    st.error("⚠️ Uploaded image is empty.")
+elif upload_type == "Image" and image_file is None:
+    st.info("📸 Please upload an image to continue.")
 if "image_description" in st.session_state:
     transcription = st.session_state.image_description
     st.text_area("🖼 Description of the image:", transcription, height=200)
