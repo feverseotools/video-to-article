@@ -192,9 +192,10 @@ if st.button("✍️ Create article"):
         else:
             st.error(f"❌ General error: {e}")
     finally:
-        try:
-            if tmp_path:
-                os.remove(tmp_path)
-        except NameError:
-            pass
+        if upload_type == "Video":
+            try:
+                if tmp_path:
+                    os.remove(tmp_path)
+            except NameError:
+                pass
             
