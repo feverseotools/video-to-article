@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 11:34h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 11:37h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -106,7 +106,7 @@ elif image_file:
 
     with st.spinner("🧠 Analyzing image with GPT-4 Vision..."):
         vision_response = client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {"role": "user", "content": [
                     {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
