@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 12:23h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 12:45h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -102,11 +102,38 @@ elif image_file:
     image_bytes = image_file.read()
     st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
-    if "image_description" not in st.session_state:
-        if not st.session_state.b64_image:
-            st.error("⚠️ No image data found. Please upload an image first.")
-            st.stop()
+    if image_file and "image_description" not in st.session_state:
+        import base64
+        image_bytes = image_file.read()
+        b64_image = base64.b64encode(image_bytes).decode("utf-8")
+        st.session_state.b64_image = b64_image
 
+        with st.spinner("🧠 Analyzing image with GPT-4o..."):
+            vision_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=800
+            )
+            st.session_state.image_description = vision_response.choices[0].message.content
+            st.success("✅ Image description generated")
+
+    if "image_description" in st.session_state:
+        transcription = st.session_state.image_description
+        st.text_area("🖼 Description of the image:", transcription, height=200)
         with st.spinner("🧠 Analyzing image with GPT-4o..."):
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
@@ -133,11 +160,38 @@ elif image_file:
     st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200)
     transcription = st.session_state.image_description
 
-if "image_description" not in st.session_state:
-    if "b64_image" not in st.session_state or not st.session_state.b64_image:
-        st.error("⚠️ No image data found. Please upload an image first.")
-        st.stop()
+    if image_file and "image_description" not in st.session_state:
+        import base64
+        image_bytes = image_file.read()
+        b64_image = base64.b64encode(image_bytes).decode("utf-8")
+        st.session_state.b64_image = b64_image
 
+        with st.spinner("🧠 Analyzing image with GPT-4o..."):
+            vision_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=800
+            )
+            st.session_state.image_description = vision_response.choices[0].message.content
+            st.success("✅ Image description generated")
+
+    if "image_description" in st.session_state:
+        transcription = st.session_state.image_description
+        st.text_area("🖼 Description of the image:", transcription, height=200)
     with st.spinner("🧠 Analyzing image with GPT-4o..."):
         vision_response = client.chat.completions.create(
             model="gpt-4o",
