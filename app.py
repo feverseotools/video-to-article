@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 12:13h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 12:18h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -99,20 +99,20 @@ if video_file:
 elif image_file:
     # Procesamiento para imagen usando GPT-4 Vision
     image_bytes = image_file.read()
-    b64_image = base64.b64encode(image_bytes).decode("utf-8")
+    st.session_state.st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
     if "image_description" not in st.session_state:
         with st.spinner("🧠 Analyzing image with GPT-4o..."):
 
             import base64
-            b64_image = base64.b64encode(image_file.getvalue()).decode("utf-8")
+            st.session_state.st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {"role": "user", "content": [
                         {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}}
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{st.session_state.b64_image}"}}
                     ]}
                 ],
                 max_tokens=800
@@ -129,7 +129,7 @@ if "image_description" not in st.session_state:
             messages=[
                 {"role": "user", "content": [
                     {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}}
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{st.session_state.b64_image}"}}
                 ]}
             ],
             max_tokens=800
