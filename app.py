@@ -103,12 +103,15 @@ elif image_file:
     st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
     if image_file and "image_description" not in st.session_state:
-        import base64
-        image_bytes = image_file.read()
-        b64_image = base64.b64encode(image_bytes).decode("utf-8")
-        st.session_state.b64_image = b64_image
+     import base64
 
-        with st.spinner("🧠 Analyzing image with GPT-4o..."):
+    # Leer y codificar la imagen una sola vez
+    image_bytes = image_file.read()
+    b64_image = base64.b64encode(image_bytes).decode("utf-8")
+    st.session_state.b64_image = b64_image
+
+    with st.spinner("🧠 Analyzing image with GPT-4o..."):
+        try:
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
@@ -130,35 +133,12 @@ elif image_file:
             )
             st.session_state.image_description = vision_response.choices[0].message.content
             st.success("✅ Image description generated")
+        except Exception as e:
+            st.error(f"❌ Error during image analysis: {e}")
 
-    if "image_description" in st.session_state:
-        transcription = st.session_state.image_description
-        st.text_area("🖼 Description of the image:", transcription, height=200)
-        with st.spinner("🧠 Analyzing image with GPT-4o..."):
-            vision_response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/jpeg;base64,{st.session_state.b64_image}"}
-                            }
-                        ]
-                    }
-                ],
-                max_tokens=800
-            )
-            st.session_state.image_description = vision_response.choices[0].message.content
-            st.success("✅ Image description generated")
-
-    st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200)
+if "image_description" in st.session_state:
     transcription = st.session_state.image_description
+    st.text_area("🖼 Description of the image:", transcription, height=200)
 
     if image_file and "image_description" not in st.session_state:
         import base64
