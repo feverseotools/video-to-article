@@ -1,4 +1,4 @@
-rom dotenv import load_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 
 from openai import OpenAI
@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 13:08h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 13:09h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
