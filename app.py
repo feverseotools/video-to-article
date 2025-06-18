@@ -97,39 +97,46 @@ if video_file:
     # Aquí sigue la lógica del flujo de creación de artículos por transcripción (como ya tienes en tu código)
 
 elif image_file:
-    # Procesamiento para imagen usando GPT-4 Vision
+    import base64  # asegúrate de importar base64 una sola vez
+
     image_bytes = image_file.read()
-    st.session_state.st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
+    st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
     if "image_description" not in st.session_state:
-        if "b64_image" not in st.session_state or not st.session_state.b64_image:
-    st.error("⚠️ No image data found. Please upload an image first.")
-    st.stop()
+        if not st.session_state.b64_image:
+            st.error("⚠️ No image data found. Please upload an image first.")
+            st.stop()
 
-    with st.spinner("🧠 Analyzing image with GPT-4o..."):
-
-            import base64
-            st.session_state.st.session_state.b64_image = base64.b64encode(image_bytes).decode("utf-8")
-
+        with st.spinner("🧠 Analyzing image with GPT-4o..."):
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
-                    {"role": "user", "content": [
-                        {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{st.session_state.get('b64_image', '')}"}}
-                    ]}
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/jpeg;base64,{st.session_state.b64_image}"}
+                            }
+                        ]
+                    }
                 ],
                 max_tokens=800
             )
-        st.session_state.image_description = vision_response.choices[0].message.content
-        st.success("✅ Image description generated")
+            st.session_state.image_description = vision_response.choices[0].message.content
+            st.success("✅ Image description generated")
 
     st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200)
     transcription = st.session_state.image_description
+
 if "image_description" not in st.session_state:
     if "b64_image" not in st.session_state or not st.session_state.b64_image:
-    st.error("⚠️ No image data found. Please upload an image first.")
-    st.stop()
+        st.error("⚠️ No image data found. Please upload an image first.")
+        st.stop()
 
     with st.spinner("🧠 Analyzing image with GPT-4o..."):
         vision_response = client.chat.completions.create(
