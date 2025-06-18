@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 11:37h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 11:43h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -104,9 +104,10 @@ elif image_file:
     image_bytes = image_file.read()
     b64_image = base64.b64encode(image_bytes).decode("utf-8")
 
+    if "image_description" not in st.session_state:
     with st.spinner("🧠 Analyzing image with GPT-4 Vision..."):
         vision_response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4-vision-preview",
             messages=[
                 {"role": "user", "content": [
                     {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
@@ -115,13 +116,11 @@ elif image_file:
             ],
             max_tokens=800
         )
+        st.session_state.image_description = vision_response.choices[0].message.content
+        st.success("✅ Image description generated")
 
-    image_description = vision_response.choices[0].message.content
-    st.success("✅ Image description generated")
-    st.text_area("🖼 Description of the image:", image_description, height=200)
-
-    # Guarda en variable general para que el resto del flujo use este texto como base
-    transcription = image_description
+        st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200)
+        transcription = st.session_state.image_description
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
