@@ -14,7 +14,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 10:38h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 11:34h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -66,59 +66,62 @@ languages = {
     "Español para España": load_prompt("prompts/languages/es-sp.txt"),
 }
 
-uploaded_file = st.file_uploader("Upload a video or an image", type=["mp4", "mov", "avi", "jpg", "jpeg", "png"])
+upload_type = st.radio("What do you want to upload?", ["Video", "Image"], horizontal=True)
 
-is_image = False
-is_video = False
-image_description = ""
+video_file = None
+image_file = None
 
-if uploaded_file:
-    file_suffix = Path(uploaded_file.name).suffix.lower()
-    is_image = file_suffix in [".jpg", ".jpeg", ".png"]
-    is_video = file_suffix in [".mp4", ".mov", ".avi"]
+if upload_type == "Video":
+    video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=["mp4", "mov", "avi", "mpeg", "mp3", "wav", "ogg", "webm"])
+elif upload_type == "Image":
+    image_file = st.file_uploader("Upload an image (.jpg, .jpeg, .png):", type=["jpg", "jpeg", "png"])
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=file_suffix) as tmp:
-        tmp.write(uploaded_file.read())
+if video_file:
+    # Asegurarte de que el código aquí solo procese vídeo
+    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
+        tmp.write(video_file.read())
         tmp_path = tmp.name
 
-    if is_image:
-        st.info("🖼 Image uploaded. Generating description with GPT-4 Vision...")
+    file_size = os.path.getsize(tmp_path)
+    st.info(f"File size: {file_size} bytes")
 
-        import base64
-        from PIL import Image
+    if file_size == 0:
+        st.error("❌ File is empty. Please upload a video with audio.")
+        st.stop()
 
-        image = Image.open(tmp_path)
-        with open(tmp_path, "rb") as img_file:
-            image_bytes = img_file.read()
-            image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    mime_type, _ = mimetypes.guess_type(tmp_path)
+    if not mime_type or not mime_type.startswith("video") and not mime_type.startswith("audio"):
+        st.error("❌ Invalid file format for Whisper. Please upload a supported video or audio file.")
+        st.stop()
 
+    # Aquí sigue la lógica del flujo de creación de artículos por transcripción (como ya tienes en tu código)
+
+elif image_file:
+    # Procesamiento para imagen usando GPT-4 Vision
+    import base64
+    import io
+
+    image_bytes = image_file.read()
+    b64_image = base64.b64encode(image_bytes).decode("utf-8")
+
+    with st.spinner("🧠 Analyzing image with GPT-4 Vision..."):
         vision_response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4-vision-preview",
             messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Describe this image in detail, including key elements, ambiance, colors, people, objects, and context."},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{image_base64}"
-                            }
-                        },
-                    ],
-                }
+                {"role": "user", "content": [
+                    {"type": "text", "text": "Describe this image in detail. Focus on visual details, place, objects, text if any."},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}}
+                ]}
             ],
             max_tokens=800
         )
-        image_description = vision_response.choices[0].message.content
-        st.success("✅ Image description generated.")
-        st.text_area("📝 Description of the image:", image_description, height=200)
 
-    elif is_video:
-        st.session_state["is_video"] = True
-    else:
-        st.error("❌ Unsupported file type.")
+    image_description = vision_response.choices[0].message.content
+    st.success("✅ Image description generated")
+    st.text_area("🖼 Description of the image:", image_description, height=200)
 
+    # Guarda en variable general para que el resto del flujo use este texto como base
+    transcription = image_description
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
