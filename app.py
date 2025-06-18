@@ -66,29 +66,59 @@ languages = {
     "Español para España": load_prompt("prompts/languages/es-sp.txt"),
 }
 
-video_file = st.file_uploader("Upload your video (.mp4, .mov, .avi...):", type=None)
+uploaded_file = st.file_uploader("Upload a video or an image", type=["mp4", "mov", "avi", "jpg", "jpeg", "png"])
 
-if video_file:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
-        tmp.write(video_file.read())
+is_image = False
+is_video = False
+image_description = ""
+
+if uploaded_file:
+    file_suffix = Path(uploaded_file.name).suffix.lower()
+    is_image = file_suffix in [".jpg", ".jpeg", ".png"]
+    is_video = file_suffix in [".mp4", ".mov", ".avi"]
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_suffix) as tmp:
+        tmp.write(uploaded_file.read())
         tmp_path = tmp.name
 
-    file_size = os.path.getsize(tmp_path)
-    st.info(f"File size: {file_size} bytes")
-    MAX_WHISPER_SIZE_MB = 25
-    MAX_WHISPER_SIZE_BYTES = MAX_WHISPER_SIZE_MB * 1024 * 1024
-    if file_size > MAX_WHISPER_SIZE_BYTES:
-     st.error(f"❌ File exceeds maximum size allowed by Whisper API ({MAX_WHISPER_SIZE_MB} MB). Please upload a smaller video.")
-     st.stop()
+    if is_image:
+        st.info("🖼 Image uploaded. Generating description with GPT-4 Vision...")
 
+        import base64
+        from PIL import Image
 
-    if file_size == 0:
-        st.error("❌ File is empty. Please, upload a video with audio.")
-        st.stop()
+        image = Image.open(tmp_path)
+        with open(tmp_path, "rb") as img_file:
+            image_bytes = img_file.read()
+            image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
-    mime_type, _ = mimetypes.guess_type(tmp_path)
-    if not mime_type:
-        mime_type = "video/mp4"
+        vision_response = client.chat.completions.create(
+            model="gpt-4-vision-preview",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Describe this image in detail, including key elements, ambiance, colors, people, objects, and context."},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}"
+                            }
+                        },
+                    ],
+                }
+            ],
+            max_tokens=800
+        )
+        image_description = vision_response.choices[0].message.content
+        st.success("✅ Image description generated.")
+        st.text_area("📝 Description of the image:", image_description, height=200)
+
+    elif is_video:
+        st.session_state["is_video"] = True
+    else:
+        st.error("❌ Unsupported file type.")
+
 
     editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
     site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
