@@ -11,7 +11,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 15:10h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v18/06/2025 15:22h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -194,3 +194,4 @@ if st.button("✍️ Create article"):
     finally:
         if "tmp_path" in locals():
             os.remove(tmp_path)
+            
