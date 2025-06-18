@@ -93,7 +93,7 @@ if uploaded_file:
             image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
         vision_response = client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
