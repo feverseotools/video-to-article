@@ -11,7 +11,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 17:06h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 16:16h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -73,7 +73,7 @@ if video_file:
     if not mime_type or not mime_type.startswith("video") and not mime_type.startswith("audio"):
         st.error("❌ Invalid file format for Whisper. Please upload a supported video or audio file.")
         st.stop()
-    if upload_type == "Video" and 'tmp_path' in locals() and os.path.exists(tmp_path):
+    if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
     # Aquí sigue la lógica del flujo de creación de artículos por transcripción (como ya tienes en tu código)
 elif image_file:
@@ -199,7 +199,7 @@ if st.button("✍️ Create article"):
         st.code(article)
         st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
         # Limpieza de archivo temporal si existe (solo en flujo de vídeo)
-        if upload_type == "Video" and 'tmp_path' in locals() and os.path.exists(tmp_path):
+        if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
         st.text_input("Press Ctrl+C to copy the article from here", value=article)
@@ -211,10 +211,6 @@ if st.button("✍️ Create article"):
         else:
             st.error(f"❌ General error: {e}")
     finally:
-        if upload_type == "Video":
-            try:
-                if tmp_path:
-                    os.remove(tmp_path)
-            except NameError:
-                pass
-            
+        if 'tmp_path' in locals() and tmp_path and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+      
