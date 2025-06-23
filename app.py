@@ -115,6 +115,19 @@ if site != "Select...":
     extra_prompt = st.text_area("Any extra info for the prompt? (optional)")
 if st.button("✍️ Create article"):
     try:
+        if upload_type == "Video":
+            with st.spinner("⏳ Getting transcription of the video with Whisper..."):
+                with open(tmp_path, "rb") as audio_file:
+                    transcript_response = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_file,
+                        response_format="json"
+                    )
+                transcription = transcript_response.text
+            st.success("✅ Transcription completed")
+            st.text_area("Text of the video:", transcription, height=200)
+        elif upload_type == "Image" and "image_description" in st.session_state:
+            transcription = st.session_state.image_description
         with st.spinner("⏳ Getting transcription of the video with Whisper..."):
             with open(tmp_path, "rb") as audio_file:
                 transcript_response = client.audio.transcriptions.create(
