@@ -11,7 +11,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 15:14h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 15:57h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -183,6 +183,10 @@ if st.button("✍️ Create article"):
         st.subheader("📋 Markdown code")
         st.code(article)
         st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+        # Limpieza de archivo temporal si existe (solo en flujo de vídeo)
+        if 'tmp_path' in locals() and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
         st.text_input("Press Ctrl+C to copy the article from here", value=article)
     except Exception as e:
         if "openai" in str(type(e)).lower():
