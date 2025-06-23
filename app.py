@@ -73,6 +73,8 @@ if video_file:
     if not mime_type or not mime_type.startswith("video") and not mime_type.startswith("audio"):
         st.error("❌ Invalid file format for Whisper. Please upload a supported video or audio file.")
         st.stop()
+    if 'tmp_path' in locals() and os.path.exists(tmp_path):
+            os.remove(tmp_path)
     # Aquí sigue la lógica del flujo de creación de artículos por transcripción (como ya tienes en tu código)
 elif image_file:
     import base64
