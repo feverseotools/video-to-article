@@ -12,7 +12,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 17:41h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 17:44h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -114,8 +114,9 @@ elif image_file:
 elif upload_type == "Image" and image_file is None:
     st.info("📸 Please upload an image to continue.")
 
+# --- PREVIEW DE DESCRIPCIÓN DE IMAGEN ---
 if "image_description" in st.session_state:
-    st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200)
+    st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200, key="image_desc_preview")
 
 # --- CONFIGURACIÓN DEL ARTÍCULO ---
 editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
@@ -140,11 +141,11 @@ if st.button("✍️ Create article"):
                     )
                 transcription = transcript_response.text
             st.success("✅ Transcription completed")
-            st.text_area("Text of the video:", transcription, height=200)
+            st.text_area("Text of the video:", transcription, height=200, key="video_text")
 
         elif upload_type == "Image" and "image_description" in st.session_state:
             transcription = st.session_state.image_description
-            st.text_area("🖼 Description of the image:", transcription, height=200)
+            st.text_area("🖼 Description of the image:", transcription, height=200, key="image_text_area")
         else:
             st.error("❌ Por favor, sube un vídeo válido o espera a que se genere la descripción de la imagen.")
             st.stop()
@@ -207,7 +208,7 @@ if st.button("✍️ Create article"):
         if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
-        st.text_input("Press Ctrl+C to copy the article from here", value=article)
+        st.text_input("Press Ctrl+C to copy the article from here", value=article, key="copy_article")
 
     except Exception as e:
         if "openai" in str(type(e)).lower():
