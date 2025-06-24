@@ -12,7 +12,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 17:44h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 16:16h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -60,11 +60,16 @@ languages = {
 upload_type = st.radio("What do you want to upload?", ["Video", "Image"], horizontal=True)
 video_file = None
 image_file = None
+is_smn_video = True
 if upload_type == "Video":
     video_file = st.file_uploader(
         "Upload your video (.mp4, .mov, .avi, .mp3, .wav, .ogg, .webm):",
         type=["mp4", "mov", "avi", "mpeg", "mp3", "wav", "ogg", "webm"]
     )
+    # Nueva opción: ¿Vídeo propio de redes sociales SMN?
+    is_smn = st.radio(
+        "¿Es un vídeo propio de las redes sociales de SMN?", ["Sí", "No"], horizontal=True, key="is_smn")
+    is_smn_video = is_smn == "Sí"
 elif upload_type == "Image":
     image_file = st.file_uploader(
         "Upload an image (.jpg, .jpeg, .png):",
@@ -119,7 +124,18 @@ if "image_description" in st.session_state:
     st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200, key="image_desc_preview")
 
 # --- CONFIGURACIÓN DEL ARTÍCULO ---
-editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
+# Extra prompt y metadatos para vídeos no SMN
+tmp_extra_video = ""
+network = ""
+username = ""
+original_url = ""
+if upload_type == "Video" and not is_smn_video and video_file:
+    tmp_extra_video = st.text_area("Instrucciones adicionales para vídeos no SMN:", height=100, key="extra_video_prompt")
+    network = st.selectbox("Red social de origen:", ["YouTube", "TikTok", "Instagram", "Facebook", "Twitter", "Otra"], key="video_network")
+    username = st.text_input("Cuenta de la red social (p.e. @usuario):", key="video_username")
+    original_url = st.text_input("URL original del vídeo:", key="video_url")
+
+editor = st.selectbox("Who is the editor of the artículo?", ["Select...", *editors.keys()])
 site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 category_key = st.selectbox("Select the type of content:", ["Select category...", *categories.keys()])
 language_key = st.selectbox("Select language for article output:", ["Select language...", *languages.keys()])
@@ -155,6 +171,13 @@ if st.button("✍️ Create article"):
         if editor != "Select...":
             full_prompt += "\n\nContexto del editor:\n" + editors[editor]
         full_prompt += "\n\nTranscripción:\n" + transcription
+
+        # Instrucciones para video no SMN + metadatos
+        if upload_type == "Video" and not is_smn_video:
+            full_prompt += "\n\nInstrucciones vídeo no SMN:\n" + tmp_extra_video
+            full_prompt += f"\n\nLa fuente del vídeo (hay que mencionarlo en el artículo) es esta red social: {network}"
+            full_prompt += f"\nLa cuenta que originalmente subió el vídeo (hay que mencionarlo en el artículo) es esta: {username}"
+            full_prompt += f"\nLa URL original del vídeo (hay que enlazarla en el artículo) es esta: {original_url}"
 
         if category_key != "Select category...":
             full_prompt += "\n\nContexto de la categoría:\n" + categories[category_key]
