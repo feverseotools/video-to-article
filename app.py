@@ -7,6 +7,13 @@ import os
 from pathlib import Path
 import mimetypes
 import glob
+# Check for OpenCV availability
+try:
+    
+    have_cv2 = True
+except ModuleNotFoundError:
+    have_cv2 = False
+    cv2 = None
 import base64
 import cv2
 
