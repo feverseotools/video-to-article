@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v24/06/2025 10:08h)",
+        "Enter your super-ultra secret password (v24/06/2025 17:11h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -100,12 +100,12 @@ if upload_type == "Video":
     if video_file:
         if have_cv2:
             visual_analysis = st.checkbox(
-                "Enable frame-by-frame visual analysis",
+                "If the video does not have a voice-over (only music, for example), check this option",
                 key="visual_analysis"
             )
             if visual_analysis:
                 frame_interval = st.slider(
-                    "Extract one frame every N seconds",
+                    "[Don't modify this unless you know what you're doing] Extract one frame every N seconds",
                     1,
                     10,
                     1,
