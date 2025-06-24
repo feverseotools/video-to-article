@@ -22,7 +22,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:50h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:52h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -81,18 +81,15 @@ if upload_type == "Video":
     )
     is_smn = st.radio("Is this an SMN-owned video?", ["Yes","No"], horizontal=True, key="is_smn")
     is_smn_video = is_smn == "Yes"
-    # Frame-by-frame visual analysis (requires OpenCV)
+        # Frame-by-frame visual analysis (requires OpenCV)
     if have_cv2:
         visual_analysis = st.checkbox("Enable frame-by-frame visual analysis", key="visual_analysis")
-        if visual_analysis and have_cv2:
+        if visual_analysis:
             frame_interval = st.slider("Extract one frame every N seconds", 1, 10, 1, key="frame_interval")
     else:
         visual_analysis = False
-        st.warning("Frame analysis disabled: OpenCV (cv2) is not installed.")("Is this an SMN-owned video?", ["Yes","No"], horizontal=True, key="is_smn")
-    is_smn_video = is_smn == "Yes"
-    visual_analysis = st.checkbox("Enable frame-by-frame visual analysis", key="visual_analysis")
-    if visual_analysis:
-        frame_interval = st.slider("Extract one frame every N seconds", 1, 10, 1, key="frame_interval")
+        st.warning("Frame analysis disabled: OpenCV (cv2) is not installed.")
+
 elif upload_type == "Image":
     image_file = st.file_uploader(
         "Upload an image (.jpg,.jpeg,.png):",
