@@ -22,7 +22,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:57h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 10:01h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
