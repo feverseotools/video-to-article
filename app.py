@@ -22,7 +22,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:40h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:50h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -81,6 +81,15 @@ if upload_type == "Video":
     )
     is_smn = st.radio("Is this an SMN-owned video?", ["Yes","No"], horizontal=True, key="is_smn")
     is_smn_video = is_smn == "Yes"
+    # Frame-by-frame visual analysis (requires OpenCV)
+    if have_cv2:
+        visual_analysis = st.checkbox("Enable frame-by-frame visual analysis", key="visual_analysis")
+        if visual_analysis and have_cv2:
+            frame_interval = st.slider("Extract one frame every N seconds", 1, 10, 1, key="frame_interval")
+    else:
+        visual_analysis = False
+        st.warning("Frame analysis disabled: OpenCV (cv2) is not installed.")("Is this an SMN-owned video?", ["Yes","No"], horizontal=True, key="is_smn")
+    is_smn_video = is_smn == "Yes"
     visual_analysis = st.checkbox("Enable frame-by-frame visual analysis", key="visual_analysis")
     if visual_analysis:
         frame_interval = st.slider("Extract one frame every N seconds", 1, 10, 1, key="frame_interval")
@@ -129,8 +138,7 @@ if "image_description" in st.session_state:
     st.text_area("🖼 Description of the image:", st.session_state.image_description, height=200, key="image_desc_preview")
 
 # --- METADATOS NO SMN ---
-tmp_extra_video = ""
-network = username = original_url = ""
+# --- METADATOS NO SMN ---
 if upload_type == "Video" and not is_smn_video and video_file:
     network = st.selectbox("Social network:", ["YouTube", "TikTok", "Instagram", "Facebook", "Twitter", "Other"], key="video_network")
     username = st.text_input("Account (example: @user123):", key="video_username")
@@ -153,7 +161,7 @@ if st.button("✍️ Create article"):
         if upload_type == "Video":
             transcription = ""
             visual_context = ""
-            if visual_analysis:
+            if visual_analysis and have_cv2:
                 cap = cv2.VideoCapture(tmp_path)
                 fps = cap.get(cv2.CAP_PROP_FPS) or 25
                 frame_count = 0
