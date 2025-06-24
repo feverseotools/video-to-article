@@ -12,7 +12,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v23/06/2025 16:16h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 09:01h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -68,8 +68,8 @@ if upload_type == "Video":
     )
     # Nueva opción: ¿Vídeo propio de redes sociales SMN?
     is_smn = st.radio(
-        "¿Es un vídeo propio de las redes sociales de SMN?", ["Sí", "No"], horizontal=True, key="is_smn")
-    is_smn_video = is_smn == "Sí"
+        "Video is from SMN?", ["Yes", "No"], horizontal=True, key="is_smn")
+    is_smn_video = is_smn == "Yes"
 elif upload_type == "Image":
     image_file = st.file_uploader(
         "Upload an image (.jpg, .jpeg, .png):",
@@ -130,12 +130,12 @@ network = ""
 username = ""
 original_url = ""
 if upload_type == "Video" and not is_smn_video and video_file:
-    tmp_extra_video = st.text_area("Instrucciones adicionales para vídeos no SMN:", height=100, key="extra_video_prompt")
-    network = st.selectbox("Red social de origen:", ["YouTube", "TikTok", "Instagram", "Facebook", "Twitter", "Otra"], key="video_network")
-    username = st.text_input("Cuenta de la red social (p.e. @usuario):", key="video_username")
-    original_url = st.text_input("URL original del vídeo:", key="video_url")
+    network = st.selectbox("Social network:", ["YouTube", "TikTok", "Instagram", "Facebook", "Twitter", "Other"], key="video_network")
+    username = st.text_input("Account (example: @user123):", key="video_username")
+    original_url = st.text_input("URL of the video:", key="video_url")
+    tmp_extra_video = st.text_area("(Optional) Extra instructions for this non-SMN video (use as much context as you want):", height=100, key="extra_video_prompt")
 
-editor = st.selectbox("Who is the editor of the artículo?", ["Select...", *editors.keys()])
+editor = st.selectbox("Who is the editor of the article?", ["Select...", *editors.keys()])
 site = st.selectbox("Where will be this article published?", ["Select...", *sites.keys()])
 category_key = st.selectbox("Select the type of content:", ["Select category...", *categories.keys()])
 language_key = st.selectbox("Select language for article output:", ["Select language...", *languages.keys()])
