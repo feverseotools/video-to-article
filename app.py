@@ -22,7 +22,7 @@ PASSWORD = "SECRETMEDIA"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
-    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 10:01h)", type="password")
+    pw = st.text_input("Enter your super-ultra secret password (v24/06/2025 10:012h)", type="password")
     if pw == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
@@ -82,7 +82,6 @@ if upload_type == "Video":
     )
     is_smn = st.radio("Is this an SMN-owned video?", ["Yes","No"], horizontal=True, key="is_smn")
     is_smn_video = is_smn == "Yes"
-    # Only attempt frame analysis options if a file is uploaded
     if video_file:
         if have_cv2:
             visual_analysis = st.checkbox("Enable frame-by-frame visual analysis", key="visual_analysis")
@@ -90,16 +89,12 @@ if upload_type == "Video":
                 frame_interval = st.slider("Extract one frame every N seconds", 1, 10, 1, key="frame_interval")
         else:
             visual_analysis = False
+            st.warning("Frame analysis disabled: install the 'opencv-python-headless' package to enable this feature.")
 elif upload_type == "Image":
     image_file = st.file_uploader(
         "Upload an image (.jpg,.jpeg,.png):",
         type=["jpg","jpeg","png"]
     )
-    image_file = st.file_uploader(
-        "Upload an image (.jpg,.jpeg,.png):",
-        type=["jpg","jpeg","png"]
-    )
-
 # --- PROCESAMIENTO DE VÍDEO ---
 if video_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=Path(video_file.name).suffix) as tmp:
