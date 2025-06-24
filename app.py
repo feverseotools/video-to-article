@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v24/06/2025 17:11h)",
+        "Enter your super-ultra secret password (v24/06/2025 17:15h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -36,8 +36,8 @@ if not st.session_state.authenticated:
 client = OpenAI()
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="STAGING Convert Video into Text")
-st.title("STAGING📝 Video > Text AI Converter for SMN")
+st.set_page_config(page_title="Convert Video into Text")
+st.title("📝 Video > Text AI Converter for SMN")
 
 # --- CARGA DE PROMPTS EXTERNOS ---
 def load_prompt(file_path):
