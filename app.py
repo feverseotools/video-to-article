@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v25/06/2025 10:35h)",
+        "Enter your super-ultra secret password (v25/06/2025 16:31h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -54,6 +54,7 @@ sites = {
 
 editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
+    "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
