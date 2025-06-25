@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v25/06/2025 16:31h)",
+        "Enter your super-ultra secret password (v25/06/2025 16:38h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -62,6 +62,7 @@ editors = {
 categories = {
     "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
+    "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
     "Generic (use with caution)": load_prompt("prompts/category/generic.txt")
 }
