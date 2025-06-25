@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v24/06/2025 17:15h)",
+        "Enter your super-ultra secret password (v25/06/2025 10:31h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -100,12 +100,12 @@ if upload_type == "Video":
     if video_file:
         if have_cv2:
             visual_analysis = st.checkbox(
-                "If the video does not have a voice-over (only music, for example), check this option",
+                "Enable frame-by-frame visual analysis",
                 key="visual_analysis"
             )
             if visual_analysis:
                 frame_interval = st.slider(
-                    "[Don't modify this unless you know what you're doing] Extract one frame every N seconds",
+                    "Extract one frame every N seconds",
                     1,
                     10,
                     1,
@@ -321,17 +321,34 @@ if st.button("✍️ Create article"):
             full_prompt += (
                 f"\n\nAdditional editor instructions:\n{extra_prompt}"
             )
-        # Generar artículo
-        with st.spinner("🧠 Generating article..."):
-            resp = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role":"system","content":
-                     "Eres un redactor profesional especializado en contenido local."},
-                    {"role":"user","content": full_prompt}
-                ],
-                temperature=0.7
-            )
+        # 3. Generar artículo con múltiples modelos de fallback
+        models = ["gpt-4o", "gpt-4", "gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-3.5"]
+        resp = None
+        last_error = None
+        for model_name in models:
+            try:
+                with st.spinner(f"🧠 Generating article using {model_name}..."):
+                    resp = client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                            {"role": "user", "content": full_prompt}
+                        ],
+                        temperature=0.7
+                    )
+                st.info(f"✅ Generated with {model_name}")
+                break
+            except Exception as e:
+                # Reintentar con siguiente modelo si error de modelo no encontrado o acceso
+                err_code = getattr(e, 'code', None)
+                if err_code == 'model_not_found' or ('does not have access' in str(e)):
+                    last_error = e
+                    continue
+                else:
+                    raise
+        if resp is None:
+            st.error(f"❌ Todos los modelos fallaron. Último error: {last_error}")
+            st.stop()
         article = resp.choices[0].message.content
         # Mostrar artículo
         st.info(f"📝 Words: {len(article.split())}")
