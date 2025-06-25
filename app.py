@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v25/06/2025 10:10h)",
+        "Enter your super-ultra secret password (v24/06/2025 10:12h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -346,7 +346,7 @@ if st.button("✍️ Create article"):
                     )
                 else:
                     raise
-        article = resp.choices[0].message.content[0].message.content
+        article = resp.choices[0].message.content
         # Mostrar artículo
         st.info(f"📝 Words: {len(article.split())}")
         st.success("✅ Article ready")
