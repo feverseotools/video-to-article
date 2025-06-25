@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v24/06/2025 10:15h)",
+        "Enter your super-ultra secret password (v25/06/2025 10:19h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -322,7 +322,7 @@ if st.button("✍️ Create article"):
                 f"\n\nAdditional editor instructions:\n{extra_prompt}"
             )
         # 3. Generar artículo con múltiples modelos de fallback
-        models = ["gpt-4", "gpt-3.5-turbo", "gpt-3.5", "text-davinci-003"]
+        models = ["gpt-4", "gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-3.5"]
         resp = None
         last_error = None
         for model_name in models:
