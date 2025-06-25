@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v24/06/2025 17:38h)",
+        "Enter your super-ultra secret password (v25/06/2025 10:10h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -100,12 +100,12 @@ if upload_type == "Video":
     if video_file:
         if have_cv2:
             visual_analysis = st.checkbox(
-                "If the video does not have a voice-over (only music, for example), check this option",
+                "Enable frame-by-frame visual analysis",
                 key="visual_analysis"
             )
             if visual_analysis:
                 frame_interval = st.slider(
-                    "[Don't modify this unless you know what you're doing] Extract one frame every N seconds",
+                    "Extract one frame every N seconds",
                     1,
                     10,
                     1,
@@ -321,18 +321,32 @@ if st.button("✍️ Create article"):
             full_prompt += (
                 f"\n\nAdditional editor instructions:\n{extra_prompt}"
             )
-        # Generar artículo
+        # 3. Generar artículo
         with st.spinner("🧠 Generating article..."):
-            resp = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role":"system","content":
-                     "Eres un redactor profesional especializado en contenido local."},
-                    {"role":"user","content": full_prompt}
-                ],
-                temperature=0.7
-            )
-        article = resp.choices[0].message.content
+            try:
+                resp = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                        {"role": "user", "content": full_prompt}
+                    ],
+                    temperature=0.7
+                )
+            except Exception as e:
+                # Fallback to gpt-3.5-turbo if no access to gpt-4
+                if hasattr(e, 'code') and getattr(e, 'code', '') == 'model_not_found':
+                    st.warning("GPT-4 no disponible, usando gpt-3.5-turbo en su lugar.")
+                    resp = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "Eres un redactor profesional especializado en contenido local."},
+                            {"role": "user", "content": full_prompt}
+                        ],
+                        temperature=0.7
+                    )
+                else:
+                    raise
+        article = resp.choices[0].message.content[0].message.content
         # Mostrar artículo
         st.info(f"📝 Words: {len(article.split())}")
         st.success("✅ Article ready")
