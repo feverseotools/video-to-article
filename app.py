@@ -107,7 +107,7 @@ if upload_type == "Video":
             )
             if visual_analysis:
                 frame_interval = st.slider(
-                    "Extract one frame every N seconds",
+                    "(Don't modify this unless you know what you're doing) Extract one frame every N seconds",
                     1,
                     10,
                     1,
