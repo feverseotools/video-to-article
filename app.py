@@ -64,7 +64,8 @@ categories = {
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
     "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
-    "Generic (use with caution)": load_prompt("prompts/category/generic.txt")
+    "Generic (use with caution)": load_prompt("prompts/category/generic.txt"),
+    "Empty (no category personalization at all)": load_prompt("prompts/category/empty.txt")
 }
 
 languages = {
