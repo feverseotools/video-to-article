@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 10:08h)",
+        "Enter your super-ultra secret password (v26/06/2025 11:28h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -259,42 +259,14 @@ if st.button("✍️ Create article"):
                         success, frame = cap.read()
                         frame_count += 1
                     cap.release()
-            # 1. Transcripción y análisis de tamaño de archivo
-            audio_size = os.path.getsize(tmp_path)
-            max_size = 25 * 1024 * 1024  # 25 MB límite de OpenAI
-            if audio_size <= max_size:
-                with st.spinner("⏳ Transcribing audio with Whisper..."):
-                    with open(tmp_path, "rb") as audio_f:
-                        tr = client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_f,
-                            response_format="json"
-                        )
-                    transcription = tr.text
-            else:
-                # Audio demasiado grande: dividir en segmentos de 5 minutos
-                segment_dir = tempfile.mkdtemp()
-                cmd = [
-                    "ffmpeg", "-i", tmp_path,
-                    "-f", "segment",
-                    "-segment_time", "300",
-                    "-c", "copy",
-                    os.path.join(segment_dir, "seg_%03d.wav")
-                ]
-                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                segments = sorted(glob.glob(os.path.join(segment_dir, "seg_*.wav")))
-                transcripts = []
-                for seg in segments:
-                    with open(seg, "rb") as audio_seg:
-                        tr = client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_seg,
-                            response_format="json"
-                        )
-                    transcripts.append(tr.text)
-                    os.remove(seg)
-                os.rmdir(segment_dir)
-                transcription = "".join(transcripts)
+            with st.spinner("⏳ Transcribing audio with Whisper..."):
+                with open(tmp_path, "rb") as audio_f:
+                    tr = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_f,
+                        response_format="json"
+                    )
+                transcription = tr.text
             st.success("✅ Transcription completed")
             st.text_area(
                 "Transcribed text:",
