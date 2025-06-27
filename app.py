@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 10:00h)",
+        "Enter your super-ultra secret password (v27/06/2025 10:08h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -36,8 +36,8 @@ if not st.session_state.authenticated:
 client = OpenAI()
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="STAGING Convert Video into Text")
-st.title("STAGING📝 Video > Text AI Converter for SMN")
+st.set_page_config(page_title="Convert Video into Text")
+st.title("📝 Video > Text AI Converter for SMN")
 
 # --- CARGA DE PROMPTS EXTERNOS ---
 def load_prompt(file_path):
@@ -54,6 +54,7 @@ sites = {
 
 editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
+    "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
@@ -61,8 +62,10 @@ editors = {
 categories = {
     "Gastronomy (restaurants, bars, street food)": load_prompt("prompts/category/food.txt"),
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
+    "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
-    "Generic (use with caution)": load_prompt("prompts/category/generic.txt")
+    "Generic (use with caution)": load_prompt("prompts/category/generic.txt"),
+    "Empty (no category personalization at all)": load_prompt("prompts/category/empty.txt")
 }
 
 languages = {
@@ -100,12 +103,12 @@ if upload_type == "Video":
     if video_file:
         if have_cv2:
             visual_analysis = st.checkbox(
-                "Enable frame-by-frame visual analysis",
+                "If this video DOESN'T include voice over, mark this box; if it does, leave it unchecked.",
                 key="visual_analysis"
             )
             if visual_analysis:
                 frame_interval = st.slider(
-                    "Extract one frame every N seconds",
+                    "(Don't modify this unless you know what you're doing) Extract one frame every N seconds",
                     1,
                     10,
                     1,
