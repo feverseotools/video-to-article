@@ -8,6 +8,10 @@ from pathlib import Path
 import mimetypes
 import glob
 import subprocess
+import shutil
+
+# Detectar si ffmpeg está disponible
+have_ffmpeg = shutil.which("ffmpeg") is not None
 
 # Check for OpenCV availability
 try:
@@ -274,6 +278,15 @@ if st.button("✍️ Create article"):
                     transcription = tr.text
             else:
                 # Audio demasiado grande: dividir en segmentos de 5 minutos
+                # ◉ ① Si no hay ffmpeg, avisamos y detenemos
+                if not have_ffmpeg:
+                    st.error(
+                        "❌ No puedo fragmentar audios grandes porque no detecto el binario `ffmpeg`. "
+                        "Por favor instala `ffmpeg` y vuelve a intentarlo."
+                    )
+                    st.stop()
+
+                # ◉ ② Creamos un directorio temporal y fragmentamos
                 segment_dir = tempfile.mkdtemp()
                 cmd = [
                     "ffmpeg", "-i", tmp_path,
@@ -282,7 +295,18 @@ if st.button("✍️ Create article"):
                     "-c", "copy",
                     os.path.join(segment_dir, "seg_%03d.wav")
                 ]
-                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                try:
+                    subprocess.run(
+                        cmd,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=True            # ← Fuerza excepción si falla
+                    )
+                except subprocess.CalledProcessError as e:
+                    st.error(f"❌ Error al fragmentar el vídeo con ffmpeg: {e}")
+                    st.stop()
+
+                # ◉ ③ Procesamos cada segmento como antes
                 segments = sorted(glob.glob(os.path.join(segment_dir, "seg_*.wav")))
                 transcripts = []
                 for seg in segments:
@@ -292,11 +316,13 @@ if st.button("✍️ Create article"):
                             file=audio_seg,
                             response_format="json"
                         )
-                    transcripts.append(tr.text)
-                    os.remove(seg)
+                        transcripts.append(tr.text)
+                        os.remove(seg)
                 os.rmdir(segment_dir)
                 transcription = "".join(transcripts)
-            st.success("✅ Transcription completed")
+
+                st.success("✅ Transcription completed")
+
             st.text_area(
                 "Transcribed text:",
                 transcription,
