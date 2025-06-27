@@ -8,7 +8,13 @@ from pathlib import Path
 import mimetypes
 import glob
 import subprocess
-import shutil
+try:
+    from imageio_ffmpeg import get_ffmpeg_exe
+    ffmpeg_cmd = get_ffmpeg_exe()
+    have_ffmpeg = True
+except ImportError:
+    ffmpeg_cmd = "ffmpeg"      # seguirá fallando si no hay binario global
+    have_ffmpeg = False
 
 # Detectar si ffmpeg está disponible
 have_ffmpeg = shutil.which("ffmpeg") is not None
@@ -289,7 +295,7 @@ if st.button("✍️ Create article"):
                 # ◉ ② Creamos un directorio temporal y fragmentamos
                 segment_dir = tempfile.mkdtemp()
                 cmd = [
-                    "ffmpeg", "-i", tmp_path,
+                    ffmpeg_cmd, "-i", tmp_path,
                     "-f", "segment",
                     "-segment_time", "300",
                     "-c", "copy",
