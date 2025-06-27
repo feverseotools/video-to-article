@@ -249,6 +249,7 @@ if st.button("✍️ Create article"):
 
         # b) Si no segmentamos aún, comprobar tamaño sobre límite
         if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
+            SEGMENT_SECONDS  = 300                # Duración máxima (en segundos) antes de segmentar
             segment = True
 
         if not segment:
