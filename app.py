@@ -11,13 +11,13 @@ import subprocess
 try:
     from imageio_ffmpeg import get_ffmpeg_exe
     ffmpeg_cmd = get_ffmpeg_exe()
-    have_ffmpeg = True
+    have_ffmpeg_cmd = True
 except ImportError:
     ffmpeg_cmd = "ffmpeg"      # seguirá fallando si no hay binario global
-    have_ffmpeg = False
+    have_ffmpeg_cmd = False
 
 # Detectar si ffmpeg está disponible
-have_ffmpeg = shutil.which("ffmpeg") is not None
+have_ffmpeg_cmd = shutil.which("ffmpeg_cmd") is not None
 
 # Check for OpenCV availability
 try:
@@ -35,7 +35,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 11:59h)",
+        "Enter your super-ultra secret password (v27/06/2025 15:19h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -285,10 +285,10 @@ if st.button("✍️ Create article"):
             else:
                 # Audio demasiado grande: dividir en segmentos de 5 minutos
                 # ◉ ① Si no hay ffmpeg, avisamos y detenemos
-                if not have_ffmpeg:
+                if not have_ffmpeg_cmd:
                     st.error(
                         "❌ No puedo fragmentar audios grandes porque no detecto el binario `ffmpeg`. "
-                        "Por favor instala `ffmpeg` y vuelve a intentarlo."
+                        "Por favor instala `ffmpeg_cmd` y vuelve a intentarlo."
                     )
                     st.stop()
 
@@ -309,7 +309,7 @@ if st.button("✍️ Create article"):
                         check=True            # ← Fuerza excepción si falla
                     )
                 except subprocess.CalledProcessError as e:
-                    st.error(f"❌ Error al fragmentar el vídeo con ffmpeg: {e}")
+                    st.error(f"❌ Error al fragmentar el vídeo con ffmpeg_cmd: {e}")
                     st.stop()
 
                 # ◉ ③ Procesamos cada segmento como antes
