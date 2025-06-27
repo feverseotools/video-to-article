@@ -17,8 +17,8 @@ except ImportError:
     ffmpeg_cmd = "ffmpeg"      # seguirá fallando si no hay binario global
     have_ffmpeg_cmd = False
 
-# Detectar si ffmpeg está disponible
-have_ffmpeg_cmd = shutil.which("ffmpeg_cmd") is not None
+# Detectar si ffmpeg está disponible (usa la variable ffmpeg_cmd, no el literal)
+have_ffmpeg_cmd = shutil.which(ffmpeg_cmd) is not None
 
 # Check for OpenCV availability
 try:
@@ -36,7 +36,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 15:19h)",
+        "Enter your super-ultra secret password (v27/06/2025 15:23h)",
         type="password"
     )
     if pw == PASSWORD:
