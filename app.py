@@ -17,6 +17,10 @@ except ImportError:
     ffmpeg_cmd = "ffmpeg"      # seguirá fallando si no hay binario global
     have_ffmpeg_cmd = False
 
+# — Definir constantes de segmentación al inicio —
+    MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB límite de OpenAI
+    SEGMENT_SECONDS = 300                # Duración máxima (segundos) antes de segmentar
+
 # Detectar si ffmpeg está disponible (usa la variable ffmpeg_cmd, no el literal)
 have_ffmpeg_cmd = shutil.which(ffmpeg_cmd) is not None
 
@@ -246,10 +250,6 @@ if st.button("✍️ Create article"):
             cap.release()
             if duration > SEGMENT_SECONDS:
                 segment = True
-
-        # — Definir constantes de segmentación al inicio —
-        MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB límite de OpenAI
-        SEGMENT_SECONDS = 300                # Duración máxima (segundos) antes de segmentar
 
         if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
             segment = True
