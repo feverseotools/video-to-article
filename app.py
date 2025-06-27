@@ -8,6 +8,7 @@ from pathlib import Path
 import mimetypes
 import glob
 import subprocess
+import shutil
 try:
     from imageio_ffmpeg import get_ffmpeg_exe
     ffmpeg_cmd = get_ffmpeg_exe()
