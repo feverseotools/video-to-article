@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import mimetypes
 import glob
+import subprocess
 
 # Check for OpenCV availability
 try:
