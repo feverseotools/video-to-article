@@ -14,12 +14,12 @@ try:
     ffmpeg_cmd = get_ffmpeg_exe()
     have_ffmpeg_cmd = True
 except ImportError:
-    ffmpeg_cmd = "ffmpeg"      # seguirá fallando si no hay binario global
+    ffmpeg_cmd = "ffmpeg"
     have_ffmpeg_cmd = False
 
-# — Parámetros de segmentación de audio —
+# — Parámetros de segmentación de audio (siempre definidos) —
 MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB límite de OpenAI
-SEGMENT_SECONDS = 300                # Duración máxima (s) antes de segmentar
+SEGMENT_SECONDS = 300                # Duración máxima (segundos) antes de segmentar
 
 # Detectar si ffmpeg está disponible (usa la variable ffmpeg_cmd, no el literal)
 have_ffmpeg_cmd = shutil.which(ffmpeg_cmd) is not None
@@ -40,7 +40,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 17:28h)",
+        "Enter your super-ultra secret password (v27/06/2025 17:33h)",
         type="password"
     )
     if pw == PASSWORD:
