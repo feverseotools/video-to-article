@@ -247,9 +247,11 @@ if st.button("✍️ Create article"):
             if duration > SEGMENT_SECONDS:
                 segment = True
 
-        # b) Si no segmentamos aún, comprobar tamaño sobre límite
+        # Parámetros de segmentación de audio
+        MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB
+        SEGMENT_SECONDS = 300                # Duración máxima (en segundos) antes de segmentar
+
         if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
-            SEGMENT_SECONDS  = 300                # Duración máxima (en segundos) antes de segmentar
             segment = True
 
         if not segment:
