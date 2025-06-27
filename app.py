@@ -250,10 +250,7 @@ if st.button("✍️ Create article"):
             cap.release()
             if duration > SEGMENT_SECONDS:
                 segment = True
-
-        if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
-            segment = True
-
+    
         if not segment:
             # → SINGLE TRANSCRIPTION
             with st.spinner("⏳ Transcribing audio with Whisper..."):
