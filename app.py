@@ -36,7 +36,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 16:19h)",
+        "Enter your super-ultra secret password (v27/06/2025 16:29h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -247,9 +247,9 @@ if st.button("✍️ Create article"):
             if duration > SEGMENT_SECONDS:
                 segment = True
 
-        # Parámetros de segmentación de audio
-        MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB
-        SEGMENT_SECONDS = 300                # Duración máxima (en segundos) antes de segmentar
+        # — Definir constantes de segmentación al inicio —
+        MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB límite de OpenAI
+        SEGMENT_SECONDS = 300                # Duración máxima (segundos) antes de segmentar
 
         if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
             segment = True
