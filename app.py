@@ -234,115 +234,86 @@ if site != "Select...":
 # --- GENERAR ARTÍCULO ---
 if st.button("✍️ Create article"):
     try:
-        # Transcripción y análisis visual
-        transcription = ""
-        visual_context = ""
-        if upload_type == "Video":
-            if visual_analysis and have_cv2:
-                with st.spinner(
-                    "🖼 Analyzing video frames (this may take some time)..."
-                ):
-                    cap = cv2.VideoCapture(tmp_path)
-                    fps = cap.get(cv2.CAP_PROP_FPS) or 25
-                    frame_count = 0
-                    success, frame = cap.read()
-                    while success:
-                        if frame_count % int(fps * frame_interval) == 0:
-                            _, buffer = cv2.imencode('.jpg', frame)
-                            b64_frame = \
-                                base64.b64encode(buffer).decode("utf-8")
-                            resp = client.chat.completions.create(
-                                model="gpt-4o",
-                                messages=[
-                                    {"role": "user", "content": [
-                                        {"type": "text", "text":
-                                            "Describe visual elements in this frame."
-                                        },
-                                        {"type": "image_url", "image_url": {
-                                            "url":
-                                            f"data:image/jpeg;base64,{b64_frame}"}}
-                                    ]}
-                                ],
-                                max_tokens=150
-                            )
-                            visual_context += (
-                                resp.choices[0].message.content + "\n"
-                            )
-                        success, frame = cap.read()
-                        frame_count += 1
-                    cap.release()
-            # 1. Transcripción y análisis de tamaño de archivo
-            audio_size = os.path.getsize(tmp_path)
-            max_size = 25 * 1024 * 1024  # 25 MB límite de OpenAI
-            if audio_size <= max_size:
-                with st.spinner("⏳ Transcribing audio with Whisper..."):
-                    with open(tmp_path, "rb") as audio_f:
-                        tr = client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_f,
-                            response_format="json"
-                        )
-                    transcription = tr.text
-            else:
-                # Audio demasiado grande: dividir en segmentos de 5 minutos
-                # ◉ ① Si no hay ffmpeg, avisamos y detenemos
-                if not have_ffmpeg_cmd:
-                    st.error(
-                        "❌ No puedo fragmentar audios grandes porque no detecto el binario `ffmpeg`. "
-                        "Por favor instala `ffmpeg_cmd` y vuelve a intentarlo."
+        # 1. ¿Necesitamos segmentar por duración o por tamaño?
+        segment = False
+
+        # a) Si OpenCV está instalado, medir duración en segundos
+        if have_cv2:
+            cap = cv2.VideoCapture(tmp_path)
+            fps = cap.get(cv2.CAP_PROP_FPS) or 1
+            total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0
+            duration = total_frames / fps
+            cap.release()
+            if duration > SEGMENT_SECONDS:
+                segment = True
+
+        # b) Si no segmentamos aún, comprobar tamaño sobre límite
+        if not segment and os.path.getsize(tmp_path) > MAX_SIZE_BYTES:
+            segment = True
+
+        if not segment:
+            # → SINGLE TRANSCRIPTION
+            with st.spinner("⏳ Transcribing audio with Whisper..."):
+                with open(tmp_path, "rb") as audio_f:
+                    tr = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_f,
+                        response_format="json"
                     )
-                    st.stop()
-
-                # ◉ ② Creamos un directorio temporal y fragmentamos
-                segment_dir = tempfile.mkdtemp()
-                cmd = [
-                    ffmpeg_cmd, "-i", tmp_path,
-                    "-f", "segment",
-                    "-segment_time", "300",
-                    "-c", "copy",
-                    os.path.join(segment_dir, "seg_%03d.wav")
-                ]
-                try:
-                    subprocess.run(
-                        cmd,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                        check=True            # ← Fuerza excepción si falla
-                    )
-                except subprocess.CalledProcessError as e:
-                    st.error(f"❌ Error al fragmentar el vídeo con ffmpeg_cmd: {e}")
-                    st.stop()
-
-                # ◉ ③ Procesamos cada segmento como antes
-                segments = sorted(glob.glob(os.path.join(segment_dir, "seg_*.wav")))
-                transcripts = []
-                for seg in segments:
-                    with open(seg, "rb") as audio_seg:
-                        tr = client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_seg,
-                            response_format="json"
-                        )
-                        transcripts.append(tr.text)
-                        os.remove(seg)
-                os.rmdir(segment_dir)
-                transcription = "".join(transcripts)
-
-                st.success("✅ Transcription completed")
-
-            st.text_area(
-                "Transcribed text:",
-                transcription,
-                height=200,
-                key="video_text"
-            )
-            if visual_analysis and have_cv2:
-                st.text_area(
-                    "Visual context:",
-                    visual_context,
-                    height=200,
-                    key="visual_context"
+                transcription = tr.text
+        else:
+            # → SEGMENTED TRANSCRIPTION con ffmpeg
+            if not have_ffmpeg_cmd:
+                st.error(
+                    "❌ No puedo fragmentar audios grandes porque no detecto `ffmpeg`. "
+                    "Instálalo y vuelve a intentarlo."
                 )
+                st.stop()
+
+            segment_dir = tempfile.mkdtemp()
+            cmd = [
+                ffmpeg_cmd, "-i", tmp_path,
+                "-f", "segment",
+                "-segment_time", str(SEGMENT_SECONDS),
+                "-c", "copy",
+                os.path.join(segment_dir, "seg_%03d.wav")
+            ]
+            try:
+                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            except subprocess.CalledProcessError as e:
+                st.error(f"❌ Error al fragmentar con ffmpeg: {e}")
+                st.stop()
+
+            segments = sorted(glob.glob(os.path.join(segment_dir, "seg_*.wav")))
+            parts = []
+            for seg in segments:
+                with open(seg, "rb") as audio_seg:
+                    tr = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_seg,
+                        response_format="json"
+                    )
+                parts.append(tr.text)
+                os.remove(seg)
+            os.rmdir(segment_dir)
+            transcription = "".join(parts)
+
+
+        st.success("✅ Transcription completed")
+
+        st.text_area(
+            "Transcribed text:",
+            transcription,
+            height=200,
+            key="video_text"
+        )
+        if visual_analysis and have_cv2:
+            st.text_area(
+                "Visual context:",
+                visual_context,
+                height=200,
+                key="visual_context"
+            )
         elif upload_type == "Image" and "image_description" in st.session_state:
             transcription = st.session_state.image_description
             st.text_area(
