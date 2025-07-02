@@ -372,7 +372,7 @@ if st.button("✍️ Create article"):
                 "y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
             )
             discover_response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "user", "content": discover_prompt}]
             )
             st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
