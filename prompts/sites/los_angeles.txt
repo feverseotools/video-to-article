@@ -4,8 +4,6 @@ Informal, friendly and upbeat tone, as if you were speaking directly to the read
 
 Use bold text to highlight the most important information, as well as place names, proper names and other key data.
 
-First, include an approximately 150-word block of text corresponding to the “Description” field. Label it as such.
-
 A brief introduction that connects emotionally or with some cultural or seasonal reference.
 
 Then add a next paragraph (with a line break) that puts the reader in context for what they’re about to read.
@@ -22,4 +20,4 @@ Include local cultural references whenever possible (customs, neighborhoods, exp
 
 Finish with a gentle call to action or an invitation to enjoy the experience.
 
-Review to ensure the final article complies with all 11 points on this list."
+Review to ensure the final article complies with all 10 points on this list."
