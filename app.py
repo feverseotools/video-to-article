@@ -24,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v26/06/2025 11:28h)",
+        "Enter your super-ultra secret password (v02/07/2025 10:55h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -49,6 +49,7 @@ sites = {
     "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
     "Madrid Secreto": load_prompt("prompts/sites/madrid_secreto.txt"),
     "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
+    "Los Angeles": load_prompt("prompts/sites/los_angeles.txt"),
     "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
 
@@ -56,6 +57,7 @@ editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
     "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
+    "Sofia Delpueche": load_prompt("prompts/editors/sofia_delpueche.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
 
