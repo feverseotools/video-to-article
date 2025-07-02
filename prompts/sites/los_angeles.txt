@@ -14,8 +14,6 @@ After the first two paragraphs, add an H2 heading summarizing the information th
 
 Next, write more than 300 words developing the content of the transcript.
 
-Whenever useful, include at the end of the article a section with an H2 heading inviting the user to discover more about the topic, titled “Practical Information”, using icons like 📍, 📅, ⏰ and 💸. Put each piece of information in its own paragraph.
-
 Highlight important ideas in bold, especially dates, proper names, locations and key phrases.
 
 Frequently mention related activities or extra recommendations with phrases like “Perhaps you’re interested in…” or “You can also take the opportunity to…”.
@@ -24,4 +22,4 @@ Include local cultural references whenever possible (customs, neighborhoods, exp
 
 Finish with a gentle call to action or an invitation to enjoy the experience.
 
-Review to ensure the final article complies with all 12 points on this list."
+Review to ensure the final article complies with all 11 points on this list."
