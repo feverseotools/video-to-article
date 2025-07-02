@@ -25,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v02/07/2025 11:21h)",
+        "Enter your super-ultra secret password (v02/07/2025 11:30h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -372,17 +372,17 @@ if st.button("✍️ Create article"):
                 messages=[{"role": "user", "content": discover_prompt}]
             )
             st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
-        st.subheader("💻 HTML code (sin renderizar)")
+        st.subheader("[Not working] 💻 HTML code")
         st.code(article, language="html")
-        st.subheader("📋 Copia el código HTML")
+        st.subheader("[Not working] 📋 Copy HTML code")
         st.text_area(
-            label="Selecciona todo y copia",
+            label="Select all and copy",
             value=article,
             height=200,
         )
         st.subheader("📋 Markdown code")
         st.code(article)
-        st.download_button("⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+        st.download_button("[NOT WORKING] ⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
         st.text_input("Press Ctrl+C to copy the article from here", value=article)
     except Exception as e:
         st.error(f"❌ Error: {e}")
