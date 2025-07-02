@@ -9,8 +9,6 @@ import mimetypes
 import glob
 import streamlit.components.v1 as components
 
-components.html(article, height=400)
-
 # Check for OpenCV availability
 try:
     import cv2
@@ -27,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v02/07/2025 11:18h)",
+        "Enter your super-ultra secret password (v02/07/2025 11:19h)",
         type="password"
     )
     if pw == PASSWORD:
