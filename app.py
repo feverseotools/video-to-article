@@ -25,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v02/07/2025 11:30h)",
+        "Enter your super-ultra secret password (v03/07/2025 10:34h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -365,7 +365,7 @@ if st.button("✍️ Create article"):
         st.subheader("📰 Headlines ideas Google Discover")
         with st.spinner("✨ Generating headlines for Google Discover..."):
             discover_prompt = (
-                "ALL IN SPANISH IF THE ARTICLE IS IN SPANISH; ALL IN ENGLISH IF THE ARTICLE IS IN ENGLISH. Adapta el output de este prompt al idioma en el que está el texto del artículo final (el idioma que el editor ha seleccionado como idioma del artículo): si el contenido está en español, escribe los titulares en español; si el contenido está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones: Un artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+                "ALL IN SPANISH (DON'T USE CAPITAL LETTERS FOR ALL WORDS THEN) IF THE ARTICLE IS IN SPANISH; ALL IN ENGLISH IF THE ARTICLE IS IN ENGLISH. Adapta el output de este prompt al idioma en el que está el texto del artículo final (el idioma que el editor ha seleccionado como idioma del artículo): si el contenido está en español, escribe los titulares en español; si el contenido está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones: Un artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
             )
             discover_response = client.chat.completions.create(
                 model="gpt-4o",
