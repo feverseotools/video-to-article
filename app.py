@@ -25,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v02/07/2025 11:30h)",
+        "Enter your super-ultra secret password (v03/07/2025 10:39h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -59,6 +59,7 @@ editors = {
     "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
     "Sofia Delpueche": load_prompt("prompts/editors/sofia_delpueche.txt"),
+    "Fever Plans": load_prompt("prompts/editors/fever_plans.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
 
@@ -67,6 +68,7 @@ categories = {
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
     "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
+    "Fever": load_prompt("prompts/category/fever.txt"),
     "Generic (use with caution)": load_prompt("prompts/category/generic.txt"),
     "Empty (no category personalization at all)": load_prompt("prompts/category/empty.txt")
 }
