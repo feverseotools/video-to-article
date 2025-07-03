@@ -25,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v03/07/2025 10:34h)",
+        "Enter your super-ultra secret password (v03/07/2025 16:18h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -51,6 +51,7 @@ sites = {
     "Madrid Secreto": load_prompt("prompts/sites/madrid_secreto.txt"),
     "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
     "Los Angeles": load_prompt("prompts/sites/los_angeles.txt"),
+    "Los Angeles": load_prompt("prompts/sites/los_angeles.txt"),
     "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
 
@@ -59,6 +60,7 @@ editors = {
     "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
     "Sofia Delpueche": load_prompt("prompts/editors/sofia_delpueche.txt"),
+    "Fever Plans": load_prompt("prompts/editors/fever_plans.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
 
@@ -67,8 +69,7 @@ categories = {
     "Sports for Secret Media": load_prompt("prompts/category/sports-smn.txt"),
     "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
-    "Generic (use with caution)": load_prompt("prompts/category/generic.txt"),
-    "Empty (no category personalization at all)": load_prompt("prompts/category/empty.txt")
+    "Generic (use with caution)": load_prompt("prompts/category/generic.txt")
 }
 
 languages = {
@@ -362,6 +363,28 @@ if st.button("✍️ Create article"):
         st.subheader("🔎 Article:")
         st.markdown(article, unsafe_allow_html=True)
         # Titulares Discover, HTML/MD preview y descarga...
+        st.subheader("📰 Headlines ideas Google Discover")
+        with st.spinner("✨ Generating headlines for Google Discover..."):
+            discover_prompt = (
+                "ALL IN SPANISH (DON'T USE CAPITAL LETTERS FOR ALL WORDS THEN) IF THE ARTICLE IS IN SPANISH; ALL IN ENGLISH IF THE ARTICLE IS IN ENGLISH. Adapta el output de este prompt al idioma en el que está el texto del artículo final (el idioma que el editor ha seleccionado como idioma del artículo): si el contenido está en español, escribe los titulares en español; si el contenido está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones: Un artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+            )
+            discover_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": discover_prompt}]
+            )
+            st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+        st.subheader("[Not working] 💻 HTML code")
+        st.code(article, language="html")
+        st.subheader("[Not working] 📋 Copy HTML code")
+        st.text_area(
+            label="Select all and copy",
+            value=article,
+            height=200,
+        )
+        st.subheader("📋 Markdown code")
+        st.code(article)
+        st.download_button("[NOT WORKING] ⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+        st.text_input("Press Ctrl+C to copy the article from here", value=article)
         st.subheader("📰 Headlines ideas Google Discover")
         with st.spinner("✨ Generating headlines for Google Discover..."):
             discover_prompt = (
