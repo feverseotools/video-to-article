@@ -7,22 +7,7 @@ import os
 from pathlib import Path
 import mimetypes
 import glob
-import subprocess
-import shutil
-try:
-    from imageio_ffmpeg import get_ffmpeg_exe
-    ffmpeg_cmd = get_ffmpeg_exe()
-    have_ffmpeg_cmd = True
-except ImportError:
-    ffmpeg_cmd = "ffmpeg"
-    have_ffmpeg_cmd = False
-
-# — Parámetros de segmentación de audio (siempre definidos) —
-MAX_SIZE_BYTES  = 25 * 1024 * 1024   # 25 MB límite de OpenAI
-SEGMENT_SECONDS = 300                # Duración máxima (segundos) antes de segmentar
-
-# Detectar si ffmpeg está disponible (usa la variable ffmpeg_cmd, no el literal)
-have_ffmpeg_cmd = shutil.which(ffmpeg_cmd) is not None
+import streamlit.components.v1 as components
 
 # Check for OpenCV availability
 try:
@@ -40,7 +25,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if not st.session_state.authenticated:
     pw = st.text_input(
-        "Enter your super-ultra secret password (v27/06/2025 17:33h)",
+        "Enter your super-ultra secret password (v02/07/2025 11:30h)",
         type="password"
     )
     if pw == PASSWORD:
@@ -65,6 +50,7 @@ sites = {
     "Barcelona Secreta": load_prompt("prompts/sites/barcelona_secreta.txt"),
     "Madrid Secreto": load_prompt("prompts/sites/madrid_secreto.txt"),
     "New York City": load_prompt("prompts/sites/nyc_secret.txt"),
+    "Los Angeles": load_prompt("prompts/sites/los_angeles.txt"),
     "EXPERIMENTAL JAKUB": load_prompt("prompts/sites/experimental.txt")
 }
 
@@ -72,6 +58,7 @@ editors = {
     "Álvaro Llagunes": load_prompt("prompts/editors/alvaro_llagunes.txt"),
     "Bianca Bahamondes": load_prompt("prompts/editors/bianca_bahamondes.txt"),
     "Jorge López Torrecilla": load_prompt("prompts/editors/jorge_lopez.txt"),
+    "Sofia Delpueche": load_prompt("prompts/editors/sofia_delpueche.txt"),
     "Alberto del Castillo": load_prompt("prompts/editors/alberto_del_castillo.txt")
 }
 
@@ -238,21 +225,43 @@ if site != "Select...":
 # --- GENERAR ARTÍCULO ---
 if st.button("✍️ Create article"):
     try:
-        # 1. ¿Necesitamos segmentar por duración o por tamaño?
-        segment = False
-
-        # a) Si OpenCV está instalado, medir duración en segundos
-        if have_cv2:
-            cap = cv2.VideoCapture(tmp_path)
-            fps = cap.get(cv2.CAP_PROP_FPS) or 1
-            total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0
-            duration = total_frames / fps
-            cap.release()
-            if duration > SEGMENT_SECONDS:
-                segment = True
-    
-        if not segment:
-            # → SINGLE TRANSCRIPTION
+        # Transcripción y análisis visual
+        transcription = ""
+        visual_context = ""
+        if upload_type == "Video":
+            if visual_analysis and have_cv2:
+                with st.spinner(
+                    "🖼 Analyzing video frames (this may take some time)..."
+                ):
+                    cap = cv2.VideoCapture(tmp_path)
+                    fps = cap.get(cv2.CAP_PROP_FPS) or 25
+                    frame_count = 0
+                    success, frame = cap.read()
+                    while success:
+                        if frame_count % int(fps * frame_interval) == 0:
+                            _, buffer = cv2.imencode('.jpg', frame)
+                            b64_frame = \
+                                base64.b64encode(buffer).decode("utf-8")
+                            resp = client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=[
+                                    {"role": "user", "content": [
+                                        {"type": "text", "text":
+                                            "Describe visual elements in this frame."
+                                        },
+                                        {"type": "image_url", "image_url": {
+                                            "url":
+                                            f"data:image/jpeg;base64,{b64_frame}"}}
+                                    ]}
+                                ],
+                                max_tokens=150
+                            )
+                            visual_context += (
+                                resp.choices[0].message.content + "\n"
+                            )
+                        success, frame = cap.read()
+                        frame_count += 1
+                    cap.release()
             with st.spinner("⏳ Transcribing audio with Whisper..."):
                 with open(tmp_path, "rb") as audio_f:
                     tr = client.audio.transcriptions.create(
@@ -261,59 +270,20 @@ if st.button("✍️ Create article"):
                         response_format="json"
                     )
                 transcription = tr.text
-        else:
-            # → SEGMENTED TRANSCRIPTION con ffmpeg
-            if not have_ffmpeg_cmd:
-                st.error(
-                    "❌ No puedo fragmentar audios grandes porque no detecto `ffmpeg`. "
-                    "Instálalo y vuelve a intentarlo."
-                )
-                st.stop()
-
-            segment_dir = tempfile.mkdtemp()
-            cmd = [
-                ffmpeg_cmd, "-i", tmp_path,
-                "-f", "segment",
-                "-segment_time", str(SEGMENT_SECONDS),
-                "-c", "copy",
-                os.path.join(segment_dir, "seg_%03d.wav")
-            ]
-            try:
-                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            except subprocess.CalledProcessError as e:
-                st.error(f"❌ Error al fragmentar con ffmpeg: {e}")
-                st.stop()
-
-            segments = sorted(glob.glob(os.path.join(segment_dir, "seg_*.wav")))
-            parts = []
-            for seg in segments:
-                with open(seg, "rb") as audio_seg:
-                    tr = client.audio.transcriptions.create(
-                        model="whisper-1",
-                        file=audio_seg,
-                        response_format="json"
-                    )
-                parts.append(tr.text)
-                os.remove(seg)
-            os.rmdir(segment_dir)
-            transcription = "".join(parts)
-
-
-        st.success("✅ Transcription completed")
-
-        st.text_area(
-            "Transcribed text:",
-            transcription,
-            height=200,
-            key="video_text"
-        )
-        if visual_analysis and have_cv2:
+            st.success("✅ Transcription completed")
             st.text_area(
-                "Visual context:",
-                visual_context,
+                "Transcribed text:",
+                transcription,
                 height=200,
-                key="visual_context"
+                key="video_text"
             )
+            if visual_analysis and have_cv2:
+                st.text_area(
+                    "Visual context:",
+                    visual_context,
+                    height=200,
+                    key="visual_context"
+                )
         elif upload_type == "Image" and "image_description" in st.session_state:
             transcription = st.session_state.image_description
             st.text_area(
@@ -392,6 +362,28 @@ if st.button("✍️ Create article"):
         st.subheader("🔎 Article:")
         st.markdown(article, unsafe_allow_html=True)
         # Titulares Discover, HTML/MD preview y descarga...
+        st.subheader("📰 Headlines ideas Google Discover")
+        with st.spinner("✨ Generating headlines for Google Discover..."):
+            discover_prompt = (
+                "ALL IN SPANISH (DON'T USE CAPITAL LETTERS FOR ALL WORDS THEN) IF THE ARTICLE IS IN SPANISH; ALL IN ENGLISH IF THE ARTICLE IS IN ENGLISH. Adapta el output de este prompt al idioma en el que está el texto del artículo final (el idioma que el editor ha seleccionado como idioma del artículo): si el contenido está en español, escribe los titulares en español; si el contenido está en inglés, escribe las ideas de titulares en inglés). A partir del siguiente artículo, genera varias sugerencias de titulares siguiendo estas instrucciones: Un artículo optimizado para Google Discover debe presentar un enfoque temático claro y alineado con intereses actuales o de tendencia, utilizando un titular con fuerte carga emocional que despierte curiosidad, urgencia o empatía, e incluya entidades reconocibles como nombres de ciudades, celebridades, marcas o términos sociales y económicos. El título debe usar lenguaje natural, incorporar adjetivos potentes, evitar fórmulas neutras o meramente SEO, y, siempre que sea posible, incluir citas textuales que aumenten el CTR.\n\nArtículo:\n" + article
+            )
+            discover_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": discover_prompt}]
+            )
+            st.markdown(discover_response.choices[0].message.content, unsafe_allow_html=True)
+        st.subheader("[Not working] 💻 HTML code")
+        st.code(article, language="html")
+        st.subheader("[Not working] 📋 Copy HTML code")
+        st.text_area(
+            label="Select all and copy",
+            value=article,
+            height=200,
+        )
+        st.subheader("📋 Markdown code")
+        st.code(article)
+        st.download_button("[NOT WORKING] ⬇️ Download as HTML", data=article, file_name="articulo.html", mime="text/html")
+        st.text_input("Press Ctrl+C to copy the article from here", value=article)
     except Exception as e:
         st.error(f"❌ Error: {e}")
     finally:
