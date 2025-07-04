@@ -70,8 +70,8 @@ categories = {
     "NYC Book Club - Community": load_prompt("prompts/category/nyc-book-club.txt"),
     "Housing situation in big cities": load_prompt("prompts/category/problemas-vivienda.txt"),
     "Fever": load_prompt("prompts/category/fever.txt"),
-    "First person": load_prompt("prompts/category/first-person.txt"),
-    "Generic (use with caution)": load_prompt("prompts/category/generic.txt")
+    "First person experience": load_prompt("prompts/category/first-person.txt"),
+    "Empty - No specific category": load_prompt("prompts/category/empty.txt")
 }
 
 languages = {
